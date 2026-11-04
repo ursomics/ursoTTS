@@ -1,0 +1,11 @@
+.cache/
+output/
+__pycache__/
+*.egg-info/
+.venv/
+.DS_Store
+
+# Voice samples are personal recordings: ignore everything in voices/
+# except the placeholder that keeps the empty folder in the repo.
+voices/*
+!voices/.gitkeep
