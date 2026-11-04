@@ -1,0 +1,6 @@
+# 한국어 + 영어 혼합 예시 (문장마다 언어 자동 감지)
+안녕하세요, Ursomics입니다. 오늘은 Claude Code로 scRNA-seq 품질 관리를 해보겠습니다.
+
+먼저 count matrix를 AnnData로 불러옵니다. [pause] Then we check the mitochondrial fraction for each cell.
+
+그럼 시작해 볼까요?

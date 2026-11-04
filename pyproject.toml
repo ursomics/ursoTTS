@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ursotts"
+version = "0.6.7"
+description = "Batch voice-cloned narration (English + Korean) for video creators, with a CLI and a web UI, built on open-source TTS."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Ursus (@ursomics)" }]
+requires-python = ">=3.10"
+dependencies = ["numpy", "soundfile", "pyyaml"]
+
+[project.optional-dependencies]
+# setuptools<81: Chatterbox's watermarker (resemble-perth) still imports pkg_resources,
+# which setuptools 81+ removed.
+chatterbox = ["chatterbox-tts", "setuptools<81"]
+ui = ["gradio>=4.44"]
+all = ["chatterbox-tts", "setuptools<81", "gradio>=4.44"]
+
+[project.scripts]
+ursotts = "ursotts.cli:main"
+
+[tool.setuptools]
+packages = ["ursotts"]
+
+[tool.setuptools.package-data]
+ursotts = ["assets/*.png"]

@@ -1,0 +1,121 @@
+# How special words are spoken. Subtitles always keep the original spelling.
+#
+# AUTOMATIC: all-caps abbreviations (DNA, ATP, HLA, MHC ...) are spelled for you
+#   English: D.N.A. (each capital letter followed by a dot = smooth, natural letters)
+#   Korean:  디엔에이 (Hangul letter names)
+#   (spell_acronyms in config.yaml). List a word here only when it should sound different.
+#
+# WRITING A SOUND
+#   Letters:         R.N.A.          each capital letter followed by a dot; never spaces or hyphens
+#   Word-like sound: NAN.og          syllables of 2+ letters joined by dots = one word ("nanog");
+#                                    CAPS mark the stressed syllable, for you to read
+#   As written:      Ursomics        no dots: read exactly as typed
+#   Note:            NANOG: {say: NAN.og, like: "NAN as in man, og as in dog"}
+#
+# GENE NAMES: if the second letter is a vowel (NANOG, GATA, SOX, KIR), start by reading
+#   it as a word (NAN.og, GAH.tah, saaks, kur). Only if that sounds wrong, spell the
+#   letters with dots (N.A.N.O.G.). Otherwise (CD8, TP53, IL2RA) spell the letters.
+#
+# Entries marked "starter" are untested guesses: check them with examples/ and fix any
+# that sound off in the web UI's Pronunciation tab (it keeps these comments).
+# "all" applies to every language; "en" / "ko" only to that language.
+# "Ursomics" is left as written on purpose; it sounds best that way.
+
+all: {}
+
+en:
+  # --- tested ---
+  scRNA-seq: single cell R.N.A. seek
+  RNA-seq: R.N.A. seek
+  UMAP: you-map
+  AnnData: Ann Data
+  Scanpy: scan-pie
+  ggplot2: G.G. plot two
+  e.g.: for example
+  # --- starter: genes and terms said as words (2nd letter a vowel, or a common word) ---
+  NANOG: {say: NAN.og, like: "NAN as in man, og as in dog, one smooth word"}
+  FACS: facks
+  RAS: rass
+  LAGE: layj
+  KIR: kur
+  ATAC-seq: AY.tack seek
+  # --- starter: letters with numbers, plurals, mixed case (not spelled automatically) ---
+  CD4: C.D. four
+  CD8: C.D. eight
+  Cd4: C.D. four
+  Cd8a: C.D. eight A.
+  TP53: T.P. fifty-three
+  IL2RA: I.L. two R.A.
+  ADRB2: A.D.R.B. two
+  TCRs: T.C.R.s
+  BCRs: B.C.R.s
+  qPCR: Q.P.C.R.
+  mRNA: M.R.N.A.
+  # --- starter: hyphenated names ---
+  PD-1: P.D. one
+  PD-L1: P.D.L. one
+  CTLA-4: C.T.L.A. four
+  IL-2: I.L. two
+  IFN-gamma: I.F.N. gamma
+  TNF-alpha: T.N.F. alpha
+  # --- starter: genes said as words (2nd letter a vowel, or by convention) ---
+  Myc: mick
+  Wnt: wint
+  Fos: foss
+  GATA3: GAH.tah THREE
+  GATA4: GAH.tah FOUR
+  GATA6: GAH.tah SIX
+  SOX17: saaks SEV.en.teen
+  BRCA1: BRACK.uh ONE
+  Foxp3: fox P three
+  # --- starter: tools and biology words ---
+  DESeq2: dee.SEEK TWO
+  PyDESeq2: pie.dee.SEEK TWO
+  biopsy: BY.op.see
+  anagen: AN.uh.jen
+  telogen: TEL.oh.jen
+
+ko:
+  # Korean: all-caps abbreviations are spelled with Hangul letter names automatically
+  # (DNA -> 디엔에이). Write entries in Hangul too, never as Latin letters.
+  # --- tested ---
+  scRNA-seq: 싱글셀 알엔에이 시퀀싱
+  RNA-seq: 알엔에이 시퀀싱
+  UMAP: 유맵
+  # --- starter ---
+  NANOG: 나녹
+  GATA3: 가타쓰리
+  GATA4: 가타포
+  GATA6: 가타식스
+  SOX17: 속스세븐틴
+  KIR: 컬
+  biopsy: 바이압시
+  FACS: 팩스
+  ATAC-seq: 에이택 시퀀싱
+  CD4: 씨디포
+  CD8: 씨디에잇
+  TCRs: 티씨알스
+  BCRs: 비씨알스
+  PD-1: 피디원
+  PD-L1: 피디엘원
+  IL-2: 아이엘투
+  TP53: 티피피프티쓰리
+  RAS: 라스
+  LAGE: 레이지
+  Myc: 믹
+  Wnt: 윈트
+  Fos: 포스
+  BRCA1: 브라카원
+  Foxp3: 폭스피쓰리
+  IL2RA: 아이엘투알에이
+  ADRB2: 에이디알비투
+  Cd4: 씨디포
+  Cd8a: 씨디에잇에이
+  qPCR: 큐피씨알
+  mRNA: 엠알엔에이
+  CTLA-4: 씨티엘에이포
+  IFN-gamma: 아이에프엔 감마
+  TNF-alpha: 티엔에프 알파
+  DESeq2: 디시크투
+  PyDESeq2: 파이디시크투
+  Scanpy: 스캔파이

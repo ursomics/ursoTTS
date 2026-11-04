@@ -1,0 +1,34 @@
+# ursotts configuration
+engine: chatterbox        # chatterbox | dummy (dummy = fast test, no GPU)
+device: auto              # auto | cuda | mps | cpu
+multilingual: true        # true = English + Korean (+ more); false = English-only model
+
+voices:                   # your own voice samples (10-30 s, clean, one speaker)
+  en: voices/my_voice_en.wav
+  ko: voices/my_voice_ko.wav
+
+default_lang: en
+lang_mode: auto           # auto = detect en/ko per sentence; or force: en / ko
+max_chars: 250            # chunk size; shorter = more stable delivery
+
+pauses:                   # seconds
+  sentence: 0.25
+  paragraph: 0.7
+
+generation:
+  exaggeration: 0.5       # expressiveness (0.3 calm ... 0.8 animated)
+  cfg_weight: 0.5         # lower (~0.3) = slower, more deliberate pacing
+  temperature: 0.8
+  seed: 42                # fixed seed = same take every re-run
+
+pronunciations: pronunciations.yaml
+
+spell_acronyms: true      # all-caps words read letter by letter: DNA -> D.N.A. (English),
+                          # DNA -> 디엔에이 (Korean). Dictionary entries always win.
+
+output:
+  mp3: true               # needs ffmpeg; loudness-normalized to -14 LUFS (YouTube)
+  srt: true               # subtitle file timed to the narration
+  normalize_db: -1.0
+
+cache_dir: .cache         # rendered chunks; edit one line, only that line re-renders

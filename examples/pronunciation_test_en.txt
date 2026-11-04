@@ -1,0 +1,33 @@
+@lang en
+# Pronunciation test (English). Lines starting with # are labels, not spoken.
+# Each paragraph tests one kind of term, so you can tell where a problem is.
+
+# 1. Brand and greeting
+Welcome to Ursomics. Today we test how gene names and abbreviations sound.
+
+# 2. Letter-by-letter abbreviations
+We extracted DNA and RNA, measured ATP, and confirmed the result by qPCR. The AUC was high and the FDR was low. Samples were sorted by FACS, and the mRNA levels matched the protein data.
+
+# 3. Sequencing methods and tools
+We ran RNA-seq, scRNA-seq and ATAC-seq, and mapped the tissue with Visium HD. The clusters were shown on a UMAP after PCA. Differential expression was tested with DESeq2 in R and PyDESeq2 in Python, and single-cell data were analyzed with Scanpy.
+
+# 4. Genes said as words
+Myc and RAS drive proliferation, Wnt signaling shapes the tissue, and Fos responds within minutes. NANOG and SOX17 mark early cell fates, and LAGE is expressed in some tumors.
+
+# 5. Genes with letters and numbers
+GATA3, GATA4 and GATA6 control different lineages. TP53 and BRCA1 are classic tumor suppressors, while EGFR and APC are frequently mutated. IL2RA is high on regulatory T cells.
+
+# 6. Mixed-case genes
+Foxp3 is the master regulator of regulatory T cells. Cd8a and Cd4 mark the two main T cell groups in mouse.
+
+# 7. Immunology terms and plurals
+CD8 T cells and CD4 T cells were compared. TCRs and BCRs were sequenced from the same cells. NK cells expressed KIR receptors and recognized HLA and MHC class I molecules.
+
+# 8. Hyphens and Greek letters
+Blocking PD-1, PD-L1 and CTLA-4 boosted the response. The cells produced IFN-gamma, TNF-alpha and IL-2.
+
+# 9. Biology words that are easy to misread
+The biopsy showed a xenograft with active anagen and telogen hair follicles. We also found ERV transcripts and high ADRB2 expression.
+
+# 10. Numbers and units
+We sequenced 12 samples at 50,000 reads per cell, with a p-value below 0.05 and a 2.5-fold change.

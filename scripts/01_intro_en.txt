@@ -1,0 +1,6 @@
+# Example English script. Lines starting with # are notes and are not spoken.
+Welcome to Ursomics. Today we will run a full scRNA-seq quality-control workflow with Claude Code.
+
+First, we load the count matrix into AnnData. [pause 0.8] Then we look at genes per cell, total counts, and the mitochondrial fraction.
+
+Let's get started.
