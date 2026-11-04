@@ -34,7 +34,7 @@
 
 [@ursomics](https://youtube.com/@ursomics) 생물정보학 영상 시리즈(영어 + 한국어)를 위해 만들었고, Claude Code로 개발했습니다.
 
-📖 **처음이신가요? [매뉴얼](docs/MANUAL.ko.md)을 읽어 보세요.** Claude Code(VS Code, Desktop, 터미널)로 설치하는 법, 대본 쓰는 법, 발음 고치는 법, 그리고 튜토리얼 영상과 논문 요약 쇼츠를 만드는 전체 작업 흐름을 다룹니다.
+📖 **처음이신가요? [매뉴얼](docs/MANUAL.ko.md)을 읽어 보세요.** Claude Code(VS Code, 데스크톱 앱, CLI)로 설치하는 법, 웹 UI, 터미널 명령어, 대본 쓰는 법, 발음 고치는 법을 다룹니다.
 
 <p align="center">
   <img src="docs/images/webui-tabs.gif" alt="ursoTTS 웹 UI: Speak, Pronunciation, Batch 탭" width="92%">
