@@ -34,7 +34,7 @@
 
 Built for the [@ursomics](https://youtube.com/@ursomics) bioinformatics video series (English + Korean), and developed with Claude Code.
 
-📖 **New here? Read the [manual](docs/MANUAL.md).** It covers setup with Claude Code (VS Code, Desktop or terminal), writing scripts, fixing pronunciation, and a complete workflow for tutorial videos and paper-summary Shorts.
+📖 **New here? Read the [manual](docs/MANUAL.md).** It covers setup with Claude Code (VS Code, the desktop app or the CLI), the web UI, terminal commands, writing scripts and fixing pronunciation.
 
 <p align="center">
   <img src="docs/images/webui-tabs.gif" alt="ursoTTS web UI: the Speak, Pronunciation and Batch tabs" width="92%">
