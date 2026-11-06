@@ -20,30 +20,130 @@ import time
 import tkinter as tk
 import webbrowser
 from pathlib import Path
-from tkinter import filedialog, font as tkfont, messagebox, ttk
+from tkinter import filedialog as _filedialog, font as tkfont, messagebox as _messagebox, ttk
 
 import yaml
 
-from . import __version__, audio
+from . import __version__, audio, i18n
 from .pipeline import Synthesizer, missing_voices, plan_batch, process_file, run_batch
 from .shared import (AUDIO_EXTS, CORAL, DEEP_CORAL, LANGS, MAX_CANDIDATES, UserError,
                      prepare_sample, suggest_spellings, upsert_pronunciation)
+from .i18n import tr, tr_exc, tr_line
 from .text import Speech, render_say
 
-# VS Code Dark+ colors, with the ursoTTS coral as the accent
-BG = "#1E1E1E"          # editor
-SIDEBAR = "#252526"
-ACTIVITY = "#333333"
-TABBAR = "#252526"
-TAB_IDLE = "#2D2D2D"
-PANEL = "#1E1E1E"
-BORDER = "#3C3C3C"
-INPUT = "#3C3C3C"
-FG = "#CCCCCC"
-FG_DIM = "#8B8B8B"
-FG_BRIGHT = "#FFFFFF"
-SELECT = "#264F78"
-HOVER = "#2A2D2E"
+
+class messagebox:
+    """tkinter.messagebox whose titles and messages go through tr() (English stays as is)."""
+
+    @staticmethod
+    def showinfo(title, message, **kw):
+        return _messagebox.showinfo(tr(title), tr(message), **kw)
+
+    @staticmethod
+    def showerror(title, message, **kw):
+        return _messagebox.showerror(tr(title), tr(message), **kw)
+
+    @staticmethod
+    def askyesno(title, message, **kw):
+        return _messagebox.askyesno(tr(title), tr(message), **kw)
+
+    @staticmethod
+    def askyesnocancel(title, message, **kw):
+        return _messagebox.askyesnocancel(tr(title), tr(message), **kw)
+
+
+class filedialog:
+    """tkinter.filedialog with translated titles and file-type names."""
+
+    @staticmethod
+    def _kw(kw):
+        if "title" in kw:
+            kw["title"] = tr(kw["title"])
+        if "filetypes" in kw:
+            kw["filetypes"] = [(tr(name), pat) for name, pat in kw["filetypes"]]
+        return kw
+
+    @staticmethod
+    def askopenfilename(**kw):
+        return _filedialog.askopenfilename(**filedialog._kw(kw))
+
+    @staticmethod
+    def asksaveasfilename(**kw):
+        return _filedialog.asksaveasfilename(**filedialog._kw(kw))
+
+    @staticmethod
+    def askdirectory(**kw):
+        return _filedialog.askdirectory(**filedialog._kw(kw))
+
+# Color themes, VS Code style. The ursoTTS coral (status bar, primary buttons) stays in every theme.
+KEYS = ("BG SIDEBAR ACTIVITY TABBAR TAB_IDLE PANEL BORDER INPUT FG FG_DIM FG_BRIGHT SELECT HOVER "
+        "EDITOR_FG CARET GUTTER COMMENT DIRECTIVE PAUSE BUTTON BUTTON_HOVER SCROLL SCROLL_HOVER "
+        "TRANSCRIPT ERROR CHECK_EDGE CHECK_HOVER ACCENT_OFF").split()
+THEMES = {
+    "Dark+": dict(BG="#1E1E1E", SIDEBAR="#252526", ACTIVITY="#333333", TABBAR="#252526", TAB_IDLE="#2D2D2D",
+                  PANEL="#1E1E1E", BORDER="#3C3C3C", INPUT="#3C3C3C", FG="#CCCCCC", FG_DIM="#8B8B8B",
+                  FG_BRIGHT="#FFFFFF", SELECT="#264F78", HOVER="#2A2D2E", EDITOR_FG="#D4D4D4", CARET="#AEAFAD",
+                  GUTTER="#858585", COMMENT="#6A9955", DIRECTIVE="#C586C0", PAUSE="#4EC9B0", BUTTON="#3A3D41",
+                  BUTTON_HOVER="#45494E", SCROLL="#424242", SCROLL_HOVER="#4F4F4F", TRANSCRIPT="#181818",
+                  ERROR="#F48771", CHECK_EDGE="#6B6B6B", CHECK_HOVER="#9D9D9D", ACCENT_OFF="#5A3A30"),
+    "Light+": dict(BG="#FFFFFF", SIDEBAR="#F3F3F3", ACTIVITY="#2C2C2C", TABBAR="#F3F3F3", TAB_IDLE="#ECECEC",
+                   PANEL="#FFFFFF", BORDER="#D4D4D4", INPUT="#FFFFFF", FG="#333333", FG_DIM="#6F6F6F",
+                   FG_BRIGHT="#000000", SELECT="#ADD6FF", HOVER="#E8E8E8", EDITOR_FG="#1E1E1E", CARET="#000000",
+                   GUTTER="#237893", COMMENT="#008000", DIRECTIVE="#AF00DB", PAUSE="#098658", BUTTON="#E1E1E1",
+                   BUTTON_HOVER="#D0D0D0", SCROLL="#C1C1C1", SCROLL_HOVER="#A8A8A8", TRANSCRIPT="#F8F8F8",
+                   ERROR="#CD3131", CHECK_EDGE="#919191", CHECK_HOVER="#6F6F6F", ACCENT_OFF="#EDBFAD"),
+    "ursoTTS Cream": dict(BG="#FBF7F1", SIDEBAR="#F6EFE6", ACTIVITY="#1B1B1B", TABBAR="#F6EFE6",
+                          TAB_IDLE="#EFE5D8", PANEL="#FBF7F1", BORDER="#E6D9C8", INPUT="#FFFFFF", FG="#1B1B1B",
+                          FG_DIM="#6E6259", FG_BRIGHT="#000000", SELECT="#F0C9B8", HOVER="#EFE5D8",
+                          EDITOR_FG="#1B1B1B", CARET="#C4623F", GUTTER="#B5A898", COMMENT="#8A7F75",
+                          DIRECTIVE="#C4623F", PAUSE="#2E7D6B", BUTTON="#EFE5D8", BUTTON_HOVER="#E6D9C8",
+                          SCROLL="#D9CBB8", SCROLL_HOVER="#C9B9A4", TRANSCRIPT="#F6EFE6", ERROR="#B3261E",
+                          CHECK_EDGE="#B5A898", CHECK_HOVER="#6E6259", ACCENT_OFF="#EDC4B1"),
+    "Monokai": dict(BG="#272822", SIDEBAR="#1E1F1C", ACTIVITY="#272822", TABBAR="#1E1F1C", TAB_IDLE="#34352F",
+                    PANEL="#272822", BORDER="#414339", INPUT="#414339", FG="#F8F8F2", FG_DIM="#90908A",
+                    FG_BRIGHT="#FFFFFF", SELECT="#49483E", HOVER="#3E3D32", EDITOR_FG="#F8F8F2", CARET="#F8F8F0",
+                    GUTTER="#90908A", COMMENT="#88846F", DIRECTIVE="#F92672", PAUSE="#A6E22E", BUTTON="#414339",
+                    BUTTON_HOVER="#4E5044", SCROLL="#5A5B52", SCROLL_HOVER="#6A6B61", TRANSCRIPT="#1E1F1C",
+                    ERROR="#F92672", CHECK_EDGE="#75715E", CHECK_HOVER="#A59F85", ACCENT_OFF="#5A3A30"),
+    "Solarized Dark": dict(BG="#002B36", SIDEBAR="#00212B", ACTIVITY="#003847", TABBAR="#00212B",
+                           TAB_IDLE="#004052", PANEL="#002B36", BORDER="#2B4C54", INPUT="#073642", FG="#93A1A1",
+                           FG_DIM="#657B83", FG_BRIGHT="#FDF6E3", SELECT="#274642", HOVER="#073642",
+                           EDITOR_FG="#93A1A1", CARET="#D30102", GUTTER="#586E75", COMMENT="#586E75",
+                           DIRECTIVE="#D33682", PAUSE="#2AA198", BUTTON="#073642", BUTTON_HOVER="#0B4A5A",
+                           SCROLL="#2B4C54", SCROLL_HOVER="#3A5F68", TRANSCRIPT="#00212B", ERROR="#DC322F",
+                           CHECK_EDGE="#586E75", CHECK_HOVER="#93A1A1", ACCENT_OFF="#4A3A33"),
+    "Solarized Light": dict(BG="#FDF6E3", SIDEBAR="#EEE8D5", ACTIVITY="#073642", TABBAR="#EEE8D5",
+                            TAB_IDLE="#E6DFCB", PANEL="#FDF6E3", BORDER="#DDD6C1", INPUT="#FFFBEF", FG="#586E75",
+                            FG_DIM="#93A1A1", FG_BRIGHT="#073642", SELECT="#D3CBB7", HOVER="#E6DFCB",
+                            EDITOR_FG="#586E75", CARET="#657B83", GUTTER="#93A1A1", COMMENT="#93A1A1",
+                            DIRECTIVE="#D33682", PAUSE="#2AA198", BUTTON="#E6DFCB", BUTTON_HOVER="#DDD6C1",
+                            SCROLL="#C9C2AD", SCROLL_HOVER="#B5AE98", TRANSCRIPT="#F5EFDC", ERROR="#DC322F",
+                            CHECK_EDGE="#93A1A1", CHECK_HOVER="#657B83", ACCENT_OFF="#EDC4B1"),
+    "High Contrast": dict(BG="#000000", SIDEBAR="#000000", ACTIVITY="#000000", TABBAR="#000000",
+                          TAB_IDLE="#000000", PANEL="#000000", BORDER="#6FC3DF", INPUT="#000000", FG="#FFFFFF",
+                          FG_DIM="#E0E0E0", FG_BRIGHT="#FFFFFF", SELECT="#0F4A85", HOVER="#1A1A1A",
+                          EDITOR_FG="#FFFFFF", CARET="#FFFFFF", GUTTER="#FFFFFF", COMMENT="#7CA668",
+                          DIRECTIVE="#C586C0", PAUSE="#4EC9B0", BUTTON="#1A1A1A", BUTTON_HOVER="#333333",
+                          SCROLL="#6FC3DF", SCROLL_HOVER="#9AD6EA", TRANSCRIPT="#000000", ERROR="#F48771",
+                          CHECK_EDGE="#FFFFFF", CHECK_HOVER="#6FC3DF", ACCENT_OFF="#5A3A30"),
+}
+DEFAULT_THEME = "Dark+"
+(BG, SIDEBAR, ACTIVITY, TABBAR, TAB_IDLE, PANEL, BORDER, INPUT, FG, FG_DIM, FG_BRIGHT, SELECT,
+ HOVER, EDITOR_FG, CARET, GUTTER, COMMENT, DIRECTIVE, PAUSE, BUTTON, BUTTON_HOVER, SCROLL,
+ SCROLL_HOVER, TRANSCRIPT, ERROR, CHECK_EDGE, CHECK_HOVER, ACCENT_OFF) = (THEMES["Dark+"][k] for k in KEYS)   # named for readers and linters
+ON_ACCENT = "#FFFFFF"        # text and marks drawn on coral, in every theme
+THEME = DEFAULT_THEME
+
+
+def apply_theme(name: str) -> str:
+    """Make `name` the current theme (module colors). Unknown names fall back to Dark+."""
+    global THEME
+    THEME = name if name in THEMES else DEFAULT_THEME
+    globals().update(THEMES[THEME])
+    return THEME
+
+
+apply_theme(DEFAULT_THEME)
 
 ASSETS = Path(__file__).parent / "assets" / "tk"
 LAYOUT_FILE = Path.home() / ".config" / "ursotts" / "app.json"
@@ -56,6 +156,16 @@ ICONS = {"speak": "mic", "pron": "text", "batch": "folder", "claude": "log"}   #
 RESTART_ARGS: list[str] = []   # set by launch() so Restart keeps options like --engine
 MOD = "Command" if sys.platform == "darwin" else "Control"
 MOD_LABEL = "⌘" if sys.platform == "darwin" else "Ctrl+"
+# Korean-capable faces tried first in Korean mode (Hangul glyphs then match the Latin text's metrics).
+# macOS: Apple SD Gothic Neo; Windows: Malgun Gothic; Linux: Noto / Nanum. Anything else falls back
+# to the system's automatic per-character font substitution.
+KO_SANS = ("Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans CJK KR", "Noto Sans KR", "NanumGothic")
+KO_MONO = ("D2Coding", "NanumGothicCoding", "Noto Sans Mono CJK KR")
+
+
+def _title(view: str) -> str:
+    """Sidebar / menu name of a view in the current language (Title Case)."""
+    return tr(TITLES[view].title())
 
 
 def _font(*names, size=12, weight="normal"):
@@ -94,11 +204,11 @@ class QueueWriter:
                 if piece.strip():
                     self.q.put(("live", piece))
             else:
-                self.q.put(("log", piece + "\n"))
+                self.q.put(("log", tr_line(piece) + "\n"))
 
     def flush(self):
         if self.buf.strip():
-            self.q.put(("log", self.buf))
+            self.q.put(("log", tr_line(self.buf)))
         self.buf = ""
 
 
@@ -162,14 +272,15 @@ class Choice(tk.Frame):
     Checkbox: a rounded square that fills coral with a white check mark.
     Radio: a circle with a coral dot. Click the box or the label to change it."""
 
-    def __init__(self, parent, text, variable, value=None, bg=SIDEBAR, font=None, radio=False):
+    def __init__(self, parent, text, variable, value=None, bg=None, font=None, radio=False):
+        bg = SIDEBAR if bg is None else bg           # looked up now, so the current theme applies
         super().__init__(parent, bg=bg, cursor="hand2")
         self.var, self.value, self.radio = variable, value, radio
         self.size = 16
         self.canvas = tk.Canvas(self, width=self.size + 2, height=self.size + 2, bg=bg,
                                 highlightthickness=0, bd=0)
         self.canvas.pack(side="left")
-        self.text = tk.Label(self, text=text, bg=bg, fg=FG, font=font, anchor="w")
+        self.text = tk.Label(self, text=tr(text), bg=bg, fg=FG, font=font, anchor="w")
         self.text.pack(side="left", padx=(7, 0))
         for w in (self, self.canvas, self.text):
             w.bind("<Button-1>", self._click)
@@ -190,7 +301,7 @@ class Choice(tk.Frame):
     def _draw(self, hover=False):
         c, n, on = self.canvas, self.size, self.selected()
         c.delete("all")
-        edge = CORAL if on else ("#9D9D9D" if hover else "#6B6B6B")
+        edge = CORAL if on else (CHECK_HOVER if hover else CHECK_EDGE)
         if self.radio:
             c.create_oval(1, 1, n, n, outline=edge, width=1.5, fill=INPUT)
             if on:
@@ -202,7 +313,7 @@ class Choice(tk.Frame):
             c.create_polygon(pts, smooth=True, fill=fill, outline=edge, width=1.2)
             if on:
                 c.create_line(4.5, n / 2 + 0.5, n / 2 - 1, n - 4.5, n - 4, 4.5,
-                              fill=FG_BRIGHT, width=2.2, capstyle="round", joinstyle="round")
+                              fill=ON_ACCENT, width=2.2, capstyle="round", joinstyle="round")
 
 
 class App:
@@ -221,13 +332,21 @@ class App:
         self.q: queue.Queue = queue.Queue()
         self.player = Player()
         self.layout = self._load_layout()
+        self.theme = apply_theme(self.layout.get("theme", DEFAULT_THEME))
+        # interface language: saved choice > URSOTTS_LANG > installer default > English
+        saved = self.layout.get("ui_lang")
+        self.ui_choice = saved if saved in i18n.LANGS_UI else None
+        i18n.set_language(i18n.resolve_language(self.ui_choice))
         sans = ("Poppins", "SF Pro Text", "Segoe UI", "Helvetica Neue", "Helvetica", "DejaVu Sans")
         mono = ("Menlo", "SF Mono", "Consolas", "DejaVu Sans Mono")
+        semibold = ("Poppins SemiBold",)
+        if i18n.get_language() == "ko":
+            sans, mono, semibold = KO_SANS + sans, KO_MONO + mono, ()
         specs = {
             "ui": _font(*sans, size=14),
-            "ui_b": _font("Poppins SemiBold", *sans, size=14, weight="bold"),
+            "ui_b": _font(*semibold, *sans, size=14, weight="bold"),
             "small": _font(*sans, size=12),
-            "head": _font("Poppins SemiBold", *sans, size=11, weight="bold"),
+            "head": _font(*semibold, *sans, size=11, weight="bold"),
             "mono": _font(*mono, size=14),
             "icon": _font(*sans, size=18, weight="bold"),
         }
@@ -243,8 +362,9 @@ class App:
         self.root.protocol("WM_DELETE_WINDOW", self.quit)
         if sys.platform == "darwin":                       # the app menu's Quit and ⌘Q from macOS
             self.root.createcommand("tk::mac::Quit", self.quit)
-        self.log(f"ursoTTS {__version__} desktop app. Project folder: {self._short(self.project)}\n")
-        self.log("The voice model loads the first time you generate; later runs are quick.\n")
+        self.log(tr("ursoTTS {version} desktop app. Project folder: {path}",
+                    version=__version__, path=self._short(self.project)) + "\n")
+        self.log(tr("The voice model loads the first time you generate; later runs are quick.") + "\n")
 
     # ------------------------------------------------------------------ style
     def _style(self):
@@ -276,7 +396,7 @@ class App:
         s.configure("Horizontal.TScale", background=SIDEBAR, troughcolor=INPUT, bordercolor=SIDEBAR,
                     lightcolor=CORAL, darkcolor=CORAL)
         s.configure("TCheckbutton", background=SIDEBAR, foreground=FG, indicatorbackground=INPUT,
-                    indicatorforeground=FG_BRIGHT, focuscolor=SIDEBAR)
+                    indicatorforeground=ON_ACCENT, focuscolor=SIDEBAR)
         s.map("TCheckbutton", background=[("active", SIDEBAR)], indicatorbackground=[("selected", CORAL)])
         s.configure("TRadiobutton", background=BG, foreground=FG, indicatorbackground=INPUT, focuscolor=BG)
         s.map("TRadiobutton", background=[("active", BG)], indicatorbackground=[("selected", CORAL)])
@@ -288,18 +408,20 @@ class App:
         s.map("Treeview.Heading", background=[("active", TAB_IDLE)])
         s.layout("Vertical.TScrollbar", [("Vertical.Scrollbar.trough", {"sticky": "ns", "children": [
             ("Vertical.Scrollbar.thumb", {"expand": "1", "sticky": "nswe"})]})])
-        s.configure("Vertical.TScrollbar", background="#424242", troughcolor=BG, bordercolor=BG,
-                    lightcolor="#424242", darkcolor="#424242", gripcount=0, width=10)
-        s.map("Vertical.TScrollbar", background=[("active", "#4F4F4F"), ("!active", "#424242")])
+        s.configure("Vertical.TScrollbar", background=SCROLL, troughcolor=BG, bordercolor=BG,
+                    lightcolor=SCROLL, darkcolor=SCROLL, gripcount=0, width=10)
+        s.map("Vertical.TScrollbar", background=[("active", SCROLL_HOVER), ("!active", SCROLL)])
 
     # ------------------------------------------------------------- widgets
-    def label(self, parent, text, kind="ui", fg=FG, bg=SIDEBAR, **kw):
-        return tk.Label(parent, text=text, font=self.fonts[kind], fg=fg, bg=bg, anchor="w", **kw)
+    def label(self, parent, text, kind="ui", fg=None, bg=None, **kw):
+        fg = FG if fg is None else fg
+        bg = SIDEBAR if bg is None else bg
+        return tk.Label(parent, text=tr(text), font=self.fonts[kind], fg=fg, bg=bg, anchor="w", **kw)
 
-    def button(self, parent, text, command, primary=False, bg=SIDEBAR, **kw):
-        color = CORAL if primary else "#3A3D41"
-        hover = DEEP_CORAL if primary else "#45494E"
-        b = tk.Label(parent, text=text, font=self.fonts["ui_b" if primary else "ui"], fg=FG_BRIGHT,
+    def button(self, parent, text, command, primary=False, bg=None, **kw):
+        color = CORAL if primary else BUTTON
+        hover = DEEP_CORAL if primary else BUTTON_HOVER
+        b = tk.Label(parent, text=tr(text), font=self.fonts["ui_b" if primary else "ui"], fg=ON_ACCENT if primary else FG_BRIGHT,
                      bg=color, padx=14, pady=6, cursor="hand2", **kw)
         b.bind("<Button-1>", lambda e: command() if str(b.cget("state")) != "disabled" else None)
         b.bind("<Enter>", lambda e: b.configure(bg=hover) if str(b.cget("state")) != "disabled" else None)
@@ -307,7 +429,7 @@ class App:
         b._color = color
         return b
 
-    def entry(self, parent, var, width=28, bg=SIDEBAR):
+    def entry(self, parent, var, width=28, bg=None):
         e = tk.Entry(parent, textvariable=var, width=width, font=self.fonts["ui"], bg=INPUT, fg=FG,
                      insertbackground=FG, relief="flat", highlightthickness=1,
                      highlightbackground=INPUT, highlightcolor=CORAL)
@@ -323,7 +445,7 @@ class App:
     def section(self, parent, title):
         f = tk.Frame(parent, bg=SIDEBAR)
         f.pack(fill="x", padx=14, pady=(14, 2))
-        self.label(f, title.upper(), "head", fg=FG_DIM).pack(fill="x")
+        self.label(f, tr(title).upper(), "head", fg=FG_DIM).pack(fill="x")
         return f
 
     def field(self, parent, text):
@@ -335,13 +457,13 @@ class App:
         self._menu()
         self.status = tk.Frame(r, bg=CORAL, height=24)
         self.status.pack(side="bottom", fill="x")
-        self.status_left = tk.Label(self.status, text="", font=self.fonts["small"], fg=FG_BRIGHT, bg=CORAL)
+        self.status_left = tk.Label(self.status, text="", font=self.fonts["small"], fg=ON_ACCENT, bg=CORAL)
         self.status_left.pack(side="left", padx=10)
-        self.status_right = tk.Label(self.status, text="", font=self.fonts["small"], fg=FG_BRIGHT, bg=CORAL)
+        self.status_right = tk.Label(self.status, text="", font=self.fonts["small"], fg=ON_ACCENT, bg=CORAL)
         self.status_right.pack(side="right", padx=10)
         # a small sliding bar while ursoTTS is working
-        ttk.Style(r).configure("Busy.Horizontal.TProgressbar", troughcolor=DEEP_CORAL, background=FG_BRIGHT,
-                               bordercolor=CORAL, lightcolor=FG_BRIGHT, darkcolor=FG_BRIGHT, thickness=6)
+        ttk.Style(r).configure("Busy.Horizontal.TProgressbar", troughcolor=DEEP_CORAL, background=ON_ACCENT,
+                               bordercolor=CORAL, lightcolor=ON_ACCENT, darkcolor=ON_ACCENT, thickness=6)
         self.busy_bar = ttk.Progressbar(self.status, mode="indeterminate", length=120,
                                         style="Busy.Horizontal.TProgressbar")
         self._set_status()
@@ -369,7 +491,7 @@ class App:
         gear.pack(side="bottom", fill="x")
         gear.bind("<Button-1>", lambda e: self.open_settings())
         gear.bind("<Enter>", lambda e: (gear.configure(image=self.gear_images["active"]),
-                                        self.status_right.configure(text="Settings (config.yaml)")))
+                                        self.status_right.configure(text=tr("Settings (config.yaml)"))))
         gear.bind("<Leave>", lambda e: (gear.configure(image=self.gear_images["inactive"]), self._set_status()))
 
         self.hpane = tk.PanedWindow(body, orient="horizontal", sashwidth=4, bg=BORDER, bd=0, sashrelief="flat")
@@ -405,33 +527,50 @@ class App:
     def _menu(self):
         m = tk.Menu(self.root)
         file = tk.Menu(m, tearoff=False)
-        file.add_command(label="Open script…", accelerator=f"{MOD_LABEL}O", command=self.open_script)
-        file.add_command(label="Save script", accelerator=f"{MOD_LABEL}S", command=self.save_script)
-        file.add_command(label="Save script as…", accelerator=f"⇧{MOD_LABEL}S" if MOD_LABEL == "⌘" else "Ctrl+Shift+S",
+        file.add_command(label=tr("Open script…"), accelerator=f"{MOD_LABEL}O", command=self.open_script)
+        file.add_command(label=tr("Save script"), accelerator=f"{MOD_LABEL}S", command=self.save_script)
+        file.add_command(label=tr("Save script as…"), accelerator=f"⇧{MOD_LABEL}S" if MOD_LABEL == "⌘" else "Ctrl+Shift+S",
                          command=self.save_script_as)
         file.add_separator()
-        file.add_command(label="Show output folder", command=lambda: reveal(self.out_root.resolve()))
+        file.add_command(label=tr("Show output folder"), command=lambda: reveal(self.out_root.resolve()))
         if not FROZEN:
-            file.add_command(label="Create launcher…", command=self.create_launcher)
+            file.add_command(label=tr("Create launcher…"), command=self.create_launcher)
         file.add_separator()
-        file.add_command(label="Quit", accelerator=f"{MOD_LABEL}Q", command=self.quit)
-        m.add_cascade(label="File", menu=file)
+        file.add_command(label=tr("Quit"), accelerator=f"{MOD_LABEL}Q", command=self.quit)
+        m.add_cascade(label=tr("File"), menu=file)
         view = tk.Menu(m, tearoff=False)
         for i, v in enumerate(VIEWS, 1):
-            view.add_command(label=TITLES[v].title(), accelerator=f"{MOD_LABEL}{i}", command=lambda v=v: self.show(v))
+            view.add_command(label=_title(v), accelerator=f"{MOD_LABEL}{i}", command=lambda v=v: self.show(v))
         view.add_separator()
-        view.add_command(label="Toggle output panel", accelerator=f"{MOD_LABEL}J", command=self.toggle_panel)
+        view.add_command(label=tr("Toggle output panel"), accelerator=f"{MOD_LABEL}J", command=self.toggle_panel)
         view.add_separator()
-        view.add_command(label="Zoom in", accelerator=f"{MOD_LABEL}+", command=lambda: self.zoom(+1))
-        view.add_command(label="Zoom out", accelerator=f"{MOD_LABEL}−", command=lambda: self.zoom(-1))
-        view.add_command(label="Actual size", accelerator=f"{MOD_LABEL}0", command=lambda: self.zoom(0))
-        m.add_cascade(label="View", menu=view)
+        themes = tk.Menu(view, tearoff=False)
+        self.theme_var = tk.StringVar(value=self.theme)
+        for name in THEMES:
+            themes.add_radiobutton(label=name, value=name, variable=self.theme_var,
+                                   command=lambda n=name: self.set_theme(n))
+        view.add_cascade(label=tr("Color Theme"), menu=themes)
+        view.add_command(label=tr("Choose color theme…"), accelerator=f"{MOD_LABEL}K {MOD_LABEL}T",
+                         command=self.pick_theme)
+        view.add_separator()
+        view.add_separator()
+        langs = tk.Menu(view, tearoff=False)
+        self.lang_var = tk.StringVar(value=i18n.get_language())
+        for code in i18n.LANGS_UI:
+            langs.add_radiobutton(label=i18n.LANG_NAMES[code], value=code, variable=self.lang_var,
+                                  command=lambda c=code: self.set_ui_language(c))
+        view.add_cascade(label="Language / 언어", menu=langs)
+        view.add_separator()
+        view.add_command(label=tr("Zoom in"), accelerator=f"{MOD_LABEL}+", command=lambda: self.zoom(+1))
+        view.add_command(label=tr("Zoom out"), accelerator=f"{MOD_LABEL}−", command=lambda: self.zoom(-1))
+        view.add_command(label=tr("Actual size"), accelerator=f"{MOD_LABEL}0", command=lambda: self.zoom(0))
+        m.add_cascade(label=tr("View"), menu=view)
         helpm = tk.Menu(m, tearoff=False)
-        helpm.add_command(label="ursoTTS manual", command=lambda: webbrowser.open(MANUAL_URL))
-        helpm.add_command(label="Open config.yaml", command=self.open_settings)
+        helpm.add_command(label=tr("ursoTTS manual"), command=self.open_manual)
+        helpm.add_command(label=tr("Open config.yaml"), command=self.open_settings)
         helpm.add_separator()
-        helpm.add_command(label="About ursoTTS", command=self.about)
-        m.add_cascade(label="Help", menu=helpm)
+        helpm.add_command(label=tr("About ursoTTS"), command=self.about)
+        m.add_cascade(label=tr("Help"), menu=helpm)
         self.root.configure(menu=m)
 
     def _shortcuts(self):
@@ -439,6 +578,18 @@ class App:
         for i, v in enumerate(VIEWS, 1):
             r.bind_all(f"<{MOD}-Key-{i}>", lambda e, v=v: self.show(v))
         r.bind_all(f"<{MOD}-j>", lambda e: self.toggle_panel())
+        self._chord = False                      # ⌘K then ⌘T opens the theme picker, as in VS Code
+        def chord_start(_e):
+            self._chord = True
+            self.root.after(1500, lambda: setattr(self, "_chord", False))
+            return "break"
+        def chord_t(_e):
+            if self._chord:
+                self._chord = False
+                self.pick_theme()
+                return "break"
+        r.bind_all(f"<{MOD}-k>", chord_start)
+        r.bind_all(f"<{MOD}-t>", chord_t)
         for key in ("equal", "plus", "KP_Add"):          # Cmd/Ctrl + (with or without Shift)
             r.bind_all(f"<{MOD}-{key}>", lambda e: self.zoom(+1))
         for key in ("minus", "underscore", "KP_Subtract"):
@@ -467,7 +618,7 @@ class App:
             for w in self.wrapped:
                 w.configure(wraplength=max(self.sidebar.winfo_width() - 32, 120))
             self._sync_gutter()
-            self._set_status(f"Zoom {round(self._scale() * 100)}%")
+            self._set_status(tr("Zoom {percent}%", percent=round(self._scale() * 100)))
             self.root.after(1500, lambda: (not self.busy) and self._set_status())
 
     def zoom(self, step: int):
@@ -486,7 +637,7 @@ class App:
         if view != getattr(self, "view", None):
             b.configure(image=self.act_images[view]["active" if inside else "inactive"])
         if inside:
-            self.status_right.configure(text=TITLES[view].title())
+            self.status_right.configure(text=_title(view))
         else:
             self._set_status()
 
@@ -496,7 +647,7 @@ class App:
         tab = tk.Frame(self.tabbar, bg=BG)
         tab.pack(side="left", fill="y")
         tk.Frame(tab, bg=CORAL, height=2).pack(fill="x", side="top")
-        self.label(tab, f"  {TAB_NAMES[view]}  ", "ui", fg=FG_BRIGHT, bg=BG, pady=6).pack(side="left")
+        self.label(tab, f"  {tr(TAB_NAMES[view])}  ", "ui", fg=FG_BRIGHT, bg=BG, pady=6).pack(side="left")
 
     def show(self, view):
         if view not in VIEWS:
@@ -512,13 +663,20 @@ class App:
         self.main_frames[view].pack(fill="both", expand=True)
         self._tab(view)
 
+    def open_manual(self):
+        """The manual on GitHub, in Korean when the interface is Korean."""
+        webbrowser.open(MANUAL_URL.replace("MANUAL.md", "MANUAL.ko.md") if i18n.get_language() == "ko" else MANUAL_URL)
+
     def about(self):
         win = tk.Toplevel(self.root, bg=BG)
-        win.title("About ursoTTS")
+        win.title(tr("About ursoTTS"))
         win.resizable(False, False)
         win.transient(self.root)
         self._about_img = tk.PhotoImage(file=str(ASSETS / "about_400x400.png"))
         tk.Label(win, image=self._about_img, bg=BG).pack()
+        if i18n.get_language() == "ko":
+            self.label(win, tr("ursoTTS {version} Korean edition", version=__version__), "ui_b",
+                       fg=FG_BRIGHT, bg=BG).pack(pady=(10, 0))
         row = tk.Frame(win, bg=BG)
         row.pack(pady=12)
         self.button(row, "GitHub", lambda: webbrowser.open("https://github.com/ursomics/ursotts"), bg=BG).pack(side="left")
@@ -537,7 +695,7 @@ class App:
         close = tk.Label(head, text="✕", font=self.fonts["ui"], fg=FG_DIM, bg=PANEL, padx=10, cursor="hand2")
         close.pack(side="right")
         close.bind("<Button-1>", lambda e: self.toggle_panel())
-        clear = tk.Label(head, text="Clear", font=self.fonts["small"], fg=FG_DIM, bg=PANEL, padx=8, cursor="hand2")
+        clear = tk.Label(head, text=tr("Clear"), font=self.fonts["small"], fg=FG_DIM, bg=PANEL, padx=8, cursor="hand2")
         clear.pack(side="right")
         clear.bind("<Button-1>", lambda e: self.logbox.delete("1.0", "end"))
         frame = tk.Frame(self.panel, bg=PANEL)
@@ -549,7 +707,7 @@ class App:
         sb.pack(side="right", fill="y")
         self.logbox.pack(side="left", fill="both", expand=True)
         self.logbox.tag_configure("accent", foreground=CORAL)
-        self.logbox.tag_configure("error", foreground="#F48771")
+        self.logbox.tag_configure("error", foreground=ERROR)
         self.logbox.tag_configure("dim", foreground=FG_DIM)
 
     def toggle_panel(self):
@@ -571,9 +729,9 @@ class App:
         if m:
             tokens, speed = int(m.group(1)), m.group(2)
             seconds = tokens / 25            # Chatterbox makes about 25 tokens per second of speech
-            text = f"  generating… {tokens} tokens (≈{seconds:.1f} s of speech)"
+            text = tr("  generating… {tokens} tokens (≈{seconds:.1f} s of speech)", tokens=tokens, seconds=seconds)
             if speed:
-                text += f" · {float(speed):.1f} tokens/s"
+                text += tr(" · {speed:.1f} tokens/s", speed=float(speed))
         else:
             text = "  " + raw.strip()[:120]
         if "live_start" in self.logbox.mark_names():
@@ -597,8 +755,9 @@ class App:
         self.side_frames["speak"] = side
         self._side_header(side, "speak")
         self.section(side, "Language")
-        self.lang = tk.StringVar(value="Auto (English + Korean)")
-        ttk.Combobox(side, textvariable=self.lang, values=list(LANGS), state="readonly", font=self.fonts["ui"]).pack(fill="x", padx=14)
+        self.lang_codes = {tr(k): v for k, v in LANGS.items()}      # shown name -> "auto" / "en" / "ko"
+        self.lang = tk.StringVar(value=tr("Auto (English + Korean)"))
+        ttk.Combobox(side, textvariable=self.lang, values=list(self.lang_codes), state="readonly", font=self.fonts["ui"]).pack(fill="x", padx=14)
 
         self.section(side, "Voices")
         self.voice_en, self.voice_ko = tk.StringVar(), tk.StringVar()
@@ -615,9 +774,9 @@ class App:
         self.section(side, "Speaking style")
         g = self.cfg["generation"]
         self.style_vars = {}
-        for key, label, lo, hi, hint in (("exaggeration", "Expressiveness", 0.25, 1.0, "calm … animated"),
-                                         ("cfg_weight", "Pacing", 0.0, 1.0, "slower … faster"),
-                                         ("temperature", "Variation", 0.3, 1.2, "steady … varied")):
+        for key, label, lo, hi, hint in (("exaggeration", tr("Expressiveness"), 0.25, 1.0, tr("calm … animated")),
+                                         ("cfg_weight", tr("Pacing"), 0.0, 1.0, tr("slower … faster")),
+                                         ("temperature", tr("Variation"), 0.3, 1.2, tr("steady … varied"))):
             var = tk.DoubleVar(value=float(g.get(key, 0.5)))
             self.style_vars[key] = var
             top = tk.Frame(side, bg=SIDEBAR)
@@ -650,7 +809,7 @@ class App:
         self.button(bar, "Open…", self.open_script, bg=BG).pack(side="left")
         self.button(bar, "Save as…", self.save_script, bg=BG).pack(side="left", padx=6)
         self.button(bar, "Clear", lambda: self.script.delete("1.0", "end"), bg=BG).pack(side="left")
-        self.gen_btn = self.button(bar, f"Generate narration   {MOD_LABEL}↵", self.generate, primary=True, bg=BG)
+        self.gen_btn = self.button(bar, tr("Generate narration") + f"   {MOD_LABEL}↵", self.generate, primary=True, bg=BG)
         self.gen_btn.pack(side="right")
         self.autoplay = tk.BooleanVar(value=True)
         Choice(bar, "Play when done", self.autoplay, bg=BG, font=self.fonts["small"]).pack(side="right", padx=12)
@@ -658,19 +817,19 @@ class App:
         ed.pack(fill="both", expand=True, padx=(0, 0), pady=(0, 6))
         self.gutter = tk.Canvas(ed, width=48, bg=BG, highlightthickness=0, bd=0)
         self.gutter.pack(side="left", fill="y")
-        self.script = tk.Text(ed, bg=BG, fg="#D4D4D4", font=self.fonts["mono"], relief="flat", undo=True,
-                              insertbackground="#AEAFAD", selectbackground=SELECT, highlightthickness=0,
+        self.script = tk.Text(ed, bg=BG, fg=EDITOR_FG, font=self.fonts["mono"], relief="flat", undo=True,
+                              insertbackground=CARET, selectbackground=SELECT, highlightthickness=0,
                               wrap="word", padx=8, pady=8)
         sb = ttk.Scrollbar(ed, orient="vertical", command=self._scroll_script)
         self.script.configure(yscrollcommand=lambda a, b: (sb.set(a, b), self._sync_gutter()))
         sb.pack(side="right", fill="y")
         self.script.pack(side="left", fill="both", expand=True)
-        self.script.tag_configure("comment", foreground="#6A9955")
-        self.script.tag_configure("directive", foreground="#C586C0")
-        self.script.tag_configure("pause", foreground="#4EC9B0")
+        self.script.tag_configure("comment", foreground=COMMENT)
+        self.script.tag_configure("directive", foreground=DIRECTIVE)
+        self.script.tag_configure("pause", foreground=PAUSE)
         self.script.bind("<<Modified>>", self._on_script_change)
         self.script.bind("<Configure>", lambda e: self.root.after_idle(self._sync_gutter))
-        hint = ("# Paste or type your narration here. Lines starting with # are not spoken.\n"
+        hint = ("# " + tr("Paste or type your narration here. Lines starting with # are not spoken.") + "\n"
                 "@lang auto\nWelcome to Ursomics. Today we analyze scRNA-seq data.\n\n"
                 "안녕하세요, Ursomics입니다. [pause 1] 오늘은 DNA 분석을 해 보겠습니다.\n")
         self.script.insert("1.0", self.layout.get("script", hint))
@@ -681,13 +840,18 @@ class App:
         self._highlight()
 
     @staticmethod
+    def _path(var) -> Path:
+        """A folder typed or shown as ~/… → a real path."""
+        return Path(var.get().strip()).expanduser()
+
+    @staticmethod
     def _short(path) -> str:
         """Show paths inside the home folder as ~/…"""
         p, home = str(path), str(Path.home())
         return "~" + p[len(home):] if p == home or p.startswith(home + os.sep) else p
 
     def _side_header(self, side, view):
-        self.label(side, f"  {TITLES[view]}", "head", fg=FG_DIM, pady=10).pack(fill="x")
+        self.label(side, "  " + tr(TITLES[view].title()).upper(), "head", fg=FG_DIM, pady=10).pack(fill="x")
 
     def _scroll_script(self, *args):
         self.script.yview(*args)
@@ -713,7 +877,7 @@ class App:
                 break
             line = int(idx.split(".")[0])
             g.create_text(width - 8, info[1], anchor="ne", text=str(line),
-                          fill="#858585", font=self.fonts["mono"])
+                          fill=GUTTER, font=self.fonts["mono"])
             nxt = self.script.index(f"{line + 1}.0")
             if nxt == idx or int(nxt.split(".")[0]) == line:
                 break
@@ -752,14 +916,14 @@ class App:
         try:
             prepared = prepare_sample(path, self.out_root / "app" / "samples")
         except UserError as e:
-            messagebox.showerror("Voice sample", str(e))
+            messagebox.showerror("Voice sample", tr_exc(e))
             return
         self.voices_dir.mkdir(parents=True, exist_ok=True)
         name = re.sub(r"[^\w\-]+", "_", Path(path).stem).strip("_") or "my_voice"
         target = self.voices_dir / f"{name}.wav"
         target.write_bytes(Path(prepared).read_bytes())
         self.refresh_voices()
-        self.log(f"Added voice {target.name} (converted to mono 24 kHz, silence trimmed).\n", "accent")
+        self.log(tr("Added voice {name} (converted to mono 24 kHz, silence trimmed).", name=target.name) + "\n", "accent")
 
     def open_script(self):
         if not self.confirm_unsaved():
@@ -791,11 +955,11 @@ class App:
         try:
             path.write_text(text + ("" if text.endswith("\n") else "\n"), encoding="utf-8")
         except OSError as e:
-            messagebox.showerror("Save script", f"Could not save {path}:\n{e}")
+            messagebox.showerror("Save script", tr("Could not save {path}:\n{error}", path=path, error=e))
             return False
         self.script_path, self.saved_text = path, text
         self._update_tab_title()
-        self.log(f"Saved {self._short(path)}\n")
+        self.log(tr("Saved {path}", path=self._short(path)) + "\n")
         return True
 
     def script_dirty(self) -> bool:
@@ -813,7 +977,7 @@ class App:
         if not self.script_dirty():
             return True
         answer = messagebox.askyesnocancel(
-            "Unsaved changes", f"Save changes to {self.script_path.name} before closing it?",
+            "Unsaved changes", tr("Save changes to {name} before closing it?", name=self.script_path.name),
             icon="warning", default="yes")
         if answer is None:            # Cancel
             return False
@@ -843,8 +1007,8 @@ class App:
         self.term = tk.StringVar()
         self.entry(side, self.term).pack(fill="x", padx=14)
         self.section(side, "Language")
-        self.pron_lang = tk.StringVar(value="English")
-        ttk.Combobox(side, textvariable=self.pron_lang, values=["English", "Korean"], state="readonly", font=self.fonts["ui"]).pack(fill="x", padx=14)
+        self.pron_lang = tk.StringVar(value=tr("English"))
+        ttk.Combobox(side, textvariable=self.pron_lang, values=[tr("English"), tr("Korean")], state="readonly", font=self.fonts["ui"]).pack(fill="x", padx=14)
         self.section(side, "Test sentence")
         self.context = tk.StringVar(value="Today we look at {word} in our data.")
         self.entry(side, self.context).pack(fill="x", padx=14)
@@ -852,18 +1016,18 @@ class App:
         row = tk.Frame(side, bg=SIDEBAR)
         row.pack(fill="x", padx=14, pady=14)
         self.button(row, "Suggest spellings", self.suggest).pack(side="left")
-        tips = ("Letters: each capital followed by a dot (R.N.A.).\n"
-                "Word-like sounds: syllables joined by dots (NAN.og).\n"
-                "Genes with a vowel 2nd letter: try the word form first.\n"
-                "Korean: write the Hangul reading (피디엘원).")
+        tips = tr("Letters: each capital followed by a dot (R.N.A.).\n"
+                  "Word-like sounds: syllables joined by dots (NAN.og).\n"
+                  "Genes with a vowel 2nd letter: try the word form first.\n"
+                  "Korean: write the Hangul reading (피디엘원).")
         self.section(side, "Tips")
         self.note(side, tips).pack(fill="x", padx=14)
 
         main = tk.Frame(self.content, bg=BG)
         self.main_frames["pron"] = main
         self.label(main, "Versions to compare, one per line", "small", fg=FG_DIM, bg=BG).pack(fill="x", padx=16, pady=(12, 4))
-        self.cands = tk.Text(main, height=6, bg=BG, fg="#D4D4D4", font=self.fonts["mono"], relief="flat",
-                             insertbackground="#AEAFAD", highlightthickness=1, highlightbackground=BORDER,
+        self.cands = tk.Text(main, height=6, bg=BG, fg=EDITOR_FG, font=self.fonts["mono"], relief="flat",
+                             insertbackground=CARET, highlightthickness=1, highlightbackground=BORDER,
                              highlightcolor=CORAL, padx=8, pady=6)
         self.cands.pack(fill="x", padx=16)
         bar = tk.Frame(main, bg=BG)
@@ -886,7 +1050,7 @@ class App:
         if not term:
             messagebox.showinfo("Pronunciation", "Type a word first, for example DNA or NANOG.")
             return
-        lang = "ko" if self.pron_lang.get() == "Korean" else "en"
+        lang = "ko" if self.pron_lang.get() == tr("Korean") else "en"
         self.cands.delete("1.0", "end")
         self.cands.insert("1.0", "\n".join(suggest_spellings(term, self.cfg, lang)))
 
@@ -896,7 +1060,7 @@ class App:
         if not cands:
             messagebox.showinfo("Pronunciation", "Add at least one spelling, or click Suggest spellings.")
             return
-        lang = "ko" if self.pron_lang.get() == "Korean" else "en"
+        lang = "ko" if self.pron_lang.get() == tr("Korean") else "en"
         context = self.context.get() if "{word}" in self.context.get() else "{word}"
         overrides = self._voice_overrides()
 
@@ -936,27 +1100,28 @@ class App:
         if not term or not choice:
             messagebox.showinfo("Pronunciation", "Listen to the versions and choose the best one first.")
             return
-        lang = "ko" if self.pron_lang.get() == "Korean" else "en"
+        lang = "ko" if self.pron_lang.get() == tr("Korean") else "en"
         path = Path(self.cfg.get("pronunciations_path") or "pronunciations.yaml")
         upsert_pronunciation(path, lang, term, choice, self.like.get())
         self.cfg["pronunciation_table"] = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-        self.log(f"Saved {term} → {choice} (voice reads “{render_say(choice)}”). "
-                 "Scripts that use it are re-rendered on the next batch.\n", "accent")
+        self.log(tr("Saved {term} → {choice} (voice reads “{spoken}”). "
+                    "Scripts that use it are re-rendered on the next batch.",
+                    term=term, choice=choice, spoken=render_say(choice)) + "\n", "accent")
 
     # ------------------------------------------------------------- batch
     def _build_batch(self):
         side = tk.Frame(self.sidebar, bg=SIDEBAR)
         self.side_frames["batch"] = side
         self._side_header(side, "batch")
-        self.src = tk.StringVar(value=str(self.layout.get("batch_src", self.project / "scripts")))
-        self.dst = tk.StringVar(value=str(self.layout.get("batch_out", self.project / "output")))
-        for title, var, cmd in (("Scripts folder", self.src, self.pick_src), ("Output folder", self.dst, self.pick_dst)):
+        self.src = tk.StringVar(value=self._short(self.layout.get("batch_src", self.project / "scripts")))
+        self.dst = tk.StringVar(value=self._short(self.layout.get("batch_out", self.project / "output")))
+        for title, var, cmd in ((tr("Scripts folder"), self.src, self.pick_src), (tr("Output folder"), self.dst, self.pick_dst)):
             self.section(side, title)
             self.entry(side, var).pack(fill="x", padx=14)
             row = tk.Frame(side, bg=SIDEBAR)
             row.pack(fill="x", padx=14, pady=(6, 0))
             self.button(row, "Choose…", cmd).pack(side="left")
-            self.button(row, "Show", lambda var=var: reveal(Path(var.get()))).pack(side="left", padx=6)
+            self.button(row, "Show", lambda var=var: reveal(self._path(var))).pack(side="left", padx=6)
         self.note(side, "To make a new folder, use the New Folder button in the folder dialog.").pack(fill="x", padx=14, pady=(6, 0))
         self.force = tk.BooleanVar(value=False)
         self.section(side, "Options")
@@ -971,9 +1136,9 @@ class App:
         frame = tk.Frame(main, bg=BG)
         frame.pack(fill="both", expand=True, padx=16, pady=(0, 10))
         self.tree = ttk.Treeview(frame, columns=("status", "length"), show="tree headings")
-        self.tree.heading("#0", text="SCRIPT", anchor="w")
-        self.tree.heading("status", text="STATUS", anchor="w")
-        self.tree.heading("length", text="LENGTH", anchor="e")
+        self.tree.heading("#0", text=tr("SCRIPT"), anchor="w")
+        self.tree.heading("status", text=tr("STATUS"), anchor="w")
+        self.tree.heading("length", text=tr("LENGTH"), anchor="e")
         self.tree.column("#0", width=320)
         self.tree.column("status", width=220)
         self.tree.column("length", width=90, anchor="e")
@@ -985,62 +1150,64 @@ class App:
         self.list_scripts()
 
     def pick_src(self):
-        d = filedialog.askdirectory(title="Choose the scripts folder", initialdir=self.src.get(), mustexist=True)
+        d = filedialog.askdirectory(title="Choose the scripts folder", initialdir=str(self._path(self.src)), mustexist=True)
         if d:
-            self.src.set(d)
+            self.src.set(self._short(d))
             self.list_scripts()
 
     def pick_dst(self):
-        d = filedialog.askdirectory(title="Choose or create the output folder", initialdir=self.dst.get())
+        d = filedialog.askdirectory(title="Choose or create the output folder", initialdir=str(self._path(self.dst)))
         if d:
-            self.dst.set(d)
+            self.dst.set(self._short(d))
             self.list_scripts()
 
     def list_scripts(self):
         self.tree.delete(*self.tree.get_children())
-        src, out = Path(self.src.get()), Path(self.dst.get())
+        src, out = self._path(self.src), self._path(self.dst)
         if not src.is_dir():
-            self.batch_note.configure(text="Choose a scripts folder.")
+            self.batch_note.configure(text=tr("Choose a scripts folder."))
             return
         files, todo, _ = plan_batch(self.cfg, src, out, False)
         changed = {p.name for p in todo}
         for p in files:
-            status = "will render" if p.name in changed else "up to date"
+            status = tr("will render") if p.name in changed else tr("up to date")
             self.tree.insert("", "end", iid=p.name, text=p.name, values=(status, ""))
-        self.batch_note.configure(text=f"{len(files)} script(s) in {src} · {len(changed)} to render")
+        self.batch_note.configure(text=tr("{count} script(s) in {path} · {todo} to render",
+                                          count=len(files), path=self._short(src), todo=len(changed)))
 
     def _play_batch_row(self, _e=None):
         sel = self.tree.selection()
         if sel:
             stem = Path(sel[0]).stem
             for ext in (".mp3", ".wav"):
-                f = Path(self.dst.get()) / f"{stem}{ext}"
+                f = self._path(self.dst) / f"{stem}{ext}"
                 if f.exists():
                     self.player.play(str(f))
                     return
 
     def render_batch(self):
-        src, out, force = Path(self.src.get()), Path(self.dst.get()), self.force.get()
+        src, out, force = self._path(self.src), self._path(self.dst), self.force.get()
         if not src.is_dir():
-            messagebox.showerror("Batch", f"Folder not found:\n{src}")
+            messagebox.showerror("Batch", tr("Folder not found:\n{path}", path=src))
             return
         files, todo, keys = plan_batch(self.cfg, src, out, force)
         if not todo:
-            self.log(f"All {len(files)} scripts are up to date. Tick “Render everything again” to redo them.\n", "accent")
+            self.log(tr("All {count} scripts are up to date. Tick “Render everything again” to redo them.",
+                        count=len(files)) + "\n", "accent")
             return
         if missing_voices(self.cfg) and self.cfg["engine"] != "dummy":
-            messagebox.showerror("Batch", "Voice sample not found:\n" + "\n".join(missing_voices(self.cfg)))
+            messagebox.showerror("Batch", tr("Voice sample not found:\n{paths}", paths="\n".join(missing_voices(self.cfg))))
             return
         for p in todo:
             if self.tree.exists(p.name):
-                self.tree.set(p.name, "status", "waiting…")
+                self.tree.set(p.name, "status", tr("waiting…"))
 
         def work():
             synth = self._synth()
             synth.voice_override, synth.voice_overrides = None, {}
             results = run_batch(self.cfg, synth, todo, out, keys, log=print)
             self.q.put(("call", lambda: self._batch_done(results, out)))
-        self.run(work, f"Rendering {len(todo)} script(s)…")
+        self.run(work, tr("Rendering {count} script(s)…", count=len(todo)))
 
     def _batch_done(self, results, out):
         ok = 0
@@ -1048,12 +1215,13 @@ class App:
             name = r.get("file")
             if self.tree.exists(name):
                 if "error" in r:
-                    self.tree.set(name, "status", "error (see OUTPUT)")
+                    self.tree.set(name, "status", tr("error (see OUTPUT)"))
                 else:
                     ok += 1
-                    self.tree.set(name, "status", "done")
-                    self.tree.set(name, "length", f"{r.get('seconds', 0)} s")
-        self.log(f"Rendered {ok} of {len(results)} scripts. Files are in {out}/.\n", "accent")
+                    self.tree.set(name, "status", tr("done"))
+                    self.tree.set(name, "length", tr("{seconds} s", seconds=r.get("seconds", 0)))
+        self.log(tr("Rendered {ok} of {total} scripts. Files are in {path}/.",
+                    ok=ok, total=len(results), path=self._short(out)) + "\n", "accent")
 
     # ------------------------------------------------------------- claude code
     def _build_claude(self):
@@ -1062,7 +1230,8 @@ class App:
         self._side_header(side, "claude")
         self.section(side, "Mode")
         self.cc_mode = tk.StringVar(value="ask" if FROZEN else "edit")
-        modes = (("ask", "Ask (no changes)"),) if FROZEN else (("ask", "Ask (no changes)"), ("edit", "Edit the app"))
+        modes = ((("ask", tr("Ask (no changes)")),) if FROZEN
+                 else (("ask", tr("Ask (no changes)")), ("edit", tr("Edit the app"))))
         for value, text in modes:
             Choice(side, text, self.cc_mode, value=value, font=self.fonts["ui"], radio=True).pack(fill="x", padx=14, pady=2)
         self.cc_continue = tk.BooleanVar(value=True)
@@ -1074,11 +1243,11 @@ class App:
         self.button(side, "Open in VS Code", self.open_vscode).pack(fill="x", padx=14, pady=(0, 6))
         self.button(side, "Copy request for VS Code", self.copy_for_vscode).pack(fill="x", padx=14)
         self.section(side, "Ideas")
-        ideas = ["Make the sidebar 340 px wide",
-                 "Use a blue status bar like VS Code",
-                 "Add a Speed slider",
-                 "Show each output file's length",
-                 "Make the editor font size 14"]
+        ideas = [tr("Make the sidebar 340 px wide"),
+                 tr("Use a blue status bar like VS Code"),
+                 tr("Add a Speed slider"),
+                 tr("Show each output file's length"),
+                 tr("Make the editor font size 14")]
         lb = tk.Listbox(side, bg=SIDEBAR, fg=FG, font=self.fonts["small"], relief="flat", height=len(ideas),
                         highlightthickness=0, selectbackground=SELECT, activestyle="none")
         for i in ideas:
@@ -1089,8 +1258,8 @@ class App:
         main = tk.Frame(self.content, bg=BG)
         self.main_frames["claude"] = main
         self.label(main, "Ask Claude Code to change or explain this app", "small", fg=FG_DIM, bg=BG).pack(fill="x", padx=16, pady=(12, 4))
-        self.cc_prompt = tk.Text(main, height=4, bg=BG, fg="#D4D4D4", font=self.fonts["mono"], relief="flat",
-                                 insertbackground="#AEAFAD", highlightthickness=1, highlightbackground=BORDER,
+        self.cc_prompt = tk.Text(main, height=4, bg=BG, fg=EDITOR_FG, font=self.fonts["mono"], relief="flat",
+                                 insertbackground=CARET, highlightthickness=1, highlightbackground=BORDER,
                                  highlightcolor=CORAL, padx=8, pady=6, wrap="word")
         self.cc_prompt.pack(fill="x", padx=16)
         bar = tk.Frame(main, bg=BG)
@@ -1098,21 +1267,21 @@ class App:
         self.cc_note = self.label(main, "", "small", fg=FG_DIM, bg=BG, justify="left", wraplength=760)
         self.cc_note.pack(fill="x", padx=16, pady=(0, 2), before=bar)
         self._claude_status()
-        self.cc_btn = self.button(bar, f"Send to Claude   {MOD_LABEL}↵", self.run_claude, primary=True, bg=BG)
+        self.cc_btn = self.button(bar, tr("Send to Claude") + f"   {MOD_LABEL}↵", self.run_claude, primary=True, bg=BG)
         self.cc_btn.pack(side="left")
         self.button(bar, "■ Stop", self.stop_claude, bg=BG).pack(side="left", padx=6)
         frame = tk.Frame(main, bg=BG)
         frame.pack(fill="both", expand=True, padx=16, pady=(0, 8))
-        self.cc_out = tk.Text(frame, bg="#181818", fg=FG, font=self.fonts["mono"], relief="flat",
+        self.cc_out = tk.Text(frame, bg=TRANSCRIPT, fg=FG, font=self.fonts["mono"], relief="flat",
                               highlightthickness=0, wrap="word", padx=10, pady=8, state="normal")
         sb = ttk.Scrollbar(frame, orient="vertical", command=self.cc_out.yview)
         self.cc_out.configure(yscrollcommand=sb.set)
         sb.pack(side="right", fill="y")
         self.cc_out.pack(side="left", fill="both", expand=True)
         self.cc_out.tag_configure("you", foreground=CORAL, font=self.fonts["ui_b"])
-        self.cc_out.tag_configure("tool", foreground="#4EC9B0")
+        self.cc_out.tag_configure("tool", foreground=PAUSE)
         self.cc_out.tag_configure("dim", foreground=FG_DIM)
-        self.cc_out.tag_configure("err", foreground="#F48771")
+        self.cc_out.tag_configure("err", foreground=ERROR)
         self.cc_proc = None
 
     def _use_idea(self, text):
@@ -1131,17 +1300,17 @@ class App:
 
     def _claude_status(self):
         if FROZEN:
-            self.cc_note.configure(text="In the installed app, Claude can explain things but can't edit the "
-                                        "app itself. To change the app, use the source version "
-                                        "(pip install) and its Edit mode, or Claude Code in VS Code.")
+            self.cc_note.configure(text=tr("In the installed app, Claude can explain things but can't edit the "
+                                           "app itself. To change the app, use the source version "
+                                           "(pip install) and its Edit mode, or Claude Code in VS Code."))
         elif self.claude_path():
-            self.cc_note.configure(text="Uses the Claude Code command line with the same Claude login as "
-                                        "VS Code. Edits are limited to reading and editing files; a backup "
-                                        "is saved first, so Undo restores the previous version.")
+            self.cc_note.configure(text=tr("Uses the Claude Code command line with the same Claude login as "
+                                           "VS Code. Edits are limited to reading and editing files; a backup "
+                                           "is saved first, so Undo restores the previous version."))
         else:
-            self.cc_note.configure(text="The Claude Code command line (claude) isn't installed. Install it "
-                                        "from code.claude.com/docs/en/setup, or use “Copy for VS Code” and "
-                                        "paste the request into the Claude panel in VS Code.")
+            self.cc_note.configure(text=tr("The Claude Code command line (claude) isn't installed. Install it "
+                                           "from code.claude.com/docs/en/setup, or use “Copy request for VS Code” and "
+                                           "paste the request into the Claude panel in VS Code."))
 
     def _cc_context(self) -> str:
         return ("The user is customizing the ursoTTS desktop app from inside the app itself. "
@@ -1149,7 +1318,9 @@ class App:
                 "the top, each view has a _build_* method). Shared logic is in ursotts/shared.py; the web UI "
                 "(ursotts/ui.py) and the pipeline must keep working, so don't change them unless asked. "
                 "Make focused, working edits, keep the app's style, and finish with a short plain-language "
-                "summary of what you changed. Tell the user to click “Restart app” to see the change.")
+                "summary of what you changed. Tell the user to click “Restart app” to see the change."
+                + (" The app is in Korean: reply to the user in Korean (the button is “⟳ 앱 다시 시작”)."
+                   if i18n.get_language() == "ko" else ""))
 
     def cc_write(self, text, tag=None):
         self.cc_out.insert("end", text, tag)
@@ -1180,15 +1351,15 @@ class App:
             cmd += ["--permission-mode", "plan", "--allowedTools", "Read,Glob,Grep"]
         if self.cc_continue.get():
             cmd.append("--continue")
-        self.cc_write(f"\n▸ You ({'edit' if edit else 'ask'}): ", "you")
+        self.cc_write(tr("\n▸ You ({mode}): ", mode=tr("edit") if edit else tr("ask")), "you")
         self.cc_write(prompt + "\n")
-        self.cc_btn.configure(state="disabled", bg="#5A3A30")
-        self._set_status("Claude Code is working…")
+        self.cc_btn.configure(state="disabled", bg=ACCENT_OFF)
+        self._set_status(tr("Claude Code is working…"))
         try:
             self.cc_proc = subprocess.Popen(cmd, cwd=str(self.project), stdout=subprocess.PIPE,
                                             stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, text=True, bufsize=1)
         except OSError as e:
-            self.cc_write(f"Could not start Claude Code: {e}\n", "err")
+            self.cc_write(tr("Could not start Claude Code: {error}", error=e) + "\n", "err")
             self._claude_finished(edit)
             return
         threading.Thread(target=self._read_claude, args=(self.cc_proc, edit), daemon=True).start()
@@ -1221,9 +1392,9 @@ class App:
                     yield f"  ⚙ {part.get('name')} {Path(target).name if '/' in str(target) else target}\n", "tool"
         elif kind == "result":
             if ev.get("is_error"):
-                yield f"Claude Code reported an error: {ev.get('result', '')}\n", "err"
+                yield tr("Claude Code reported an error: {error}", error=ev.get("result", "")) + "\n", "err"
             secs = (ev.get("duration_ms") or 0) / 1000
-            yield f"  done in {secs:.0f} s\n", "dim"
+            yield tr("  done in {seconds:.0f} s", seconds=secs) + "\n", "dim"
 
     def _claude_finished(self, edit):
         self.cc_btn.configure(state="normal", bg=self.cc_btn._color)
@@ -1231,16 +1402,16 @@ class App:
         if edit:
             changed = self._changed_files()
             if changed:
-                self.cc_write("  changed: " + ", ".join(changed) + "\n", "tool")
-                self.cc_write("  Click “⟳ Restart app” to see the change, or “↶ Undo last change” to go back.\n", "dim")
-                self.log("Claude Code changed: " + ", ".join(changed) + "\n", "accent")
+                self.cc_write(tr("  changed: {files}", files=", ".join(changed)) + "\n", "tool")
+                self.cc_write(tr("  Click “⟳ Restart app” to see the change, or “↶ Undo last change” to go back.") + "\n", "dim")
+                self.log(tr("Claude Code changed: {files}", files=", ".join(changed)) + "\n", "accent")
             else:
-                self.cc_write("  no files were changed\n", "dim")
+                self.cc_write(tr("  no files were changed") + "\n", "dim")
 
     def stop_claude(self):
         if self.cc_proc and self.cc_proc.poll() is None:
             self.cc_proc.terminate()
-            self.cc_write("  stopped\n", "err")
+            self.cc_write(tr("  stopped") + "\n", "err")
 
     # snapshots for Undo: the app's own files only
     def _tracked(self):
@@ -1285,8 +1456,8 @@ class App:
             messagebox.showinfo("Undo", "There's no saved version to go back to yet.")
             return
         snap = snaps[-1]
-        if not messagebox.askyesno("Undo last change", f"Restore the app files saved before the last Claude edit "
-                                   f"({snap.name})? Then restart the app."):
+        if not messagebox.askyesno("Undo last change", tr("Restore the app files saved before the last Claude edit "
+                                                          "({name})? Then restart the app.", name=snap.name)):
             return
         for f in snap.rglob("*"):
             if f.is_file():
@@ -1295,8 +1466,8 @@ class App:
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(f, dst)
         shutil.rmtree(snap, ignore_errors=True)
-        self.cc_write("  restored the previous version; click “⟳ Restart app”\n", "tool")
-        self.log(f"Undo: restored app files from {snap.name}\n", "accent")
+        self.cc_write(tr("  restored the previous version; click “⟳ Restart app”") + "\n", "tool")
+        self.log(tr("Undo: restored app files from {name}", name=snap.name) + "\n", "accent")
 
     def open_vscode(self):
         code = shutil.which("code") or ("/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
@@ -1309,12 +1480,12 @@ class App:
             messagebox.showinfo("VS Code", "VS Code wasn't found. Open the project folder in VS Code yourself.")
 
     def copy_for_vscode(self):
-        prompt = self.cc_prompt.get("1.0", "end").strip() or "(describe your change here)"
+        prompt = self.cc_prompt.get("1.0", "end").strip() or tr("(describe your change here)")
         text = (f"{prompt}\n\nContext: this is for the ursoTTS desktop app, @ursotts/app.py "
                 "(Tkinter, VS Code Dark style). Keep the web UI (ursotts/ui.py) and the pipeline working.")
         self.root.clipboard_clear()
         self.root.clipboard_append(text)
-        self.cc_write("  copied: paste it into the Claude panel in VS Code\n", "dim")
+        self.cc_write(tr("  copied: paste it into the Claude panel in VS Code") + "\n", "dim")
 
     def restart(self):
         if not self.ok_to_close():
@@ -1332,10 +1503,10 @@ class App:
         self.cfg["generation"].update(g)
         if self.synth is None:
             from .engine import make_engine
-            print("[ursotts] loading the voice model (first time only)…")
+            print(tr("[ursotts] loading the voice model (first time only)…"))
             t0 = time.time()
             self.synth = Synthesizer(self.cfg, make_engine(self.cfg))
-            print(f"[ursotts] voice model ready in {time.time() - t0:.1f} s")
+            print(tr("[ursotts] voice model ready in {seconds:.1f} s", seconds=time.time() - t0))
             self.q.put(("call", self._set_status))
         self.synth.engine.update(**g)
         return self.synth
@@ -1353,7 +1524,7 @@ class App:
         if not overrides and self.cfg["engine"] != "dummy":
             messagebox.showerror("Speak", "No voice found. Use “+ Add voice file…” to add a WAV or MP3 sample.")
             return
-        run_cfg = {**self.cfg, "lang_mode": LANGS[self.lang.get()]}
+        run_cfg = {**self.cfg, "lang_mode": self.lang_codes.get(self.lang.get(), "auto")}
 
         def work():
             synth = self._synth()
@@ -1376,7 +1547,8 @@ class App:
             if f.endswith((".mp3", ".wav")):
                 self.file_paths.insert(0, f)
                 self.files.insert(0, Path(f).name)
-        self.log(f"Made {r['seconds']} s of audio in {r['render_time']} s → {Path(made[0]).parent}/\n", "accent")
+        self.log(tr("Made {seconds} s of audio in {took} s → {path}/",
+                    seconds=r["seconds"], took=r["render_time"], path=Path(made[0]).parent) + "\n", "accent")
         if self.autoplay.get() and made:
             self.player.play(made[0])
 
@@ -1390,11 +1562,11 @@ class App:
             messagebox.showinfo("ursoTTS", "Please wait: another task is still running.")
             return
         self.busy = True
-        self._set_status(busy_text)
+        self._set_status(tr(busy_text))
         self.busy_bar.pack(side="right", padx=(0, 4))
         self.busy_bar.start(15)
         for b in (self.gen_btn, self.listen_btn, self.batch_btn):
-            b.configure(state="disabled", bg="#5A3A30")
+            b.configure(state="disabled", bg=ACCENT_OFF)
         if not self.panel_visible:
             self.toggle_panel()
 
@@ -1404,7 +1576,7 @@ class App:
                 with contextlib.redirect_stdout(writer), contextlib.redirect_stderr(writer):
                     work()
             except Exception as e:  # shown in the panel instead of crashing the window
-                self.q.put(("error", f"{type(e).__name__}: {e}\n"))
+                self.q.put(("error", f"{type(e).__name__}: {tr_exc(e)}\n"))
             finally:
                 writer.flush()
                 self.q.put(("done", None))
@@ -1438,9 +1610,10 @@ class App:
 
     def _set_status(self, busy: str | None = None):
         engine = self.cfg.get("engine", "chatterbox")
-        model = "model ready" if self.synth else "model loads on first run"
-        self.status_left.configure(text=f"  ursoTTS {__version__}   ·   engine: {engine}   ·   {model}")
-        self.status_right.configure(text=busy or f"Ready   ·   {MOD_LABEL}J panel   ·   {MOD_LABEL}↵ run")
+        model = tr("model ready") if self.synth else tr("model loads on first run")
+        self.status_left.configure(text=tr("  ursoTTS {version}   ·   engine: {engine}   ·   {model}",
+                                           version=__version__, engine=engine, model=model))
+        self.status_right.configure(text=busy or tr("Ready   ·   {mod}J panel   ·   {mod}↵ run", mod=MOD_LABEL))
 
     def open_settings(self):
         path = (self.project / "config.yaml").resolve()
@@ -1463,7 +1636,9 @@ class App:
             data = {"geometry": self.root.geometry(), "view": self.view, "panel": self.panel_visible,
                     "sidebar": self.sidebar.winfo_width(),
                     "panel_height": self.panel.winfo_height() if self.panel_visible else self.layout.get("panel_height", 210),
-                    "batch_src": self.src.get(), "batch_out": self.dst.get(), "zoom": self.zoom_level,
+                    "batch_src": str(self._path(self.src)), "batch_out": str(self._path(self.dst)), "zoom": self.zoom_level,
+                    "theme": self.theme,
+                    **({"ui_lang": self.ui_choice} if self.ui_choice else {}),
                     "script": self.script.get("1.0", "end-1c"),
                     "script_path": str(self.script_path) if self.script_path else None,
                     "saved_text": self.saved_text if self.script_path else None}
@@ -1477,13 +1652,67 @@ class App:
         try:
             made = make_launcher(self.project)
         except (SystemExit, Exception) as e:
-            messagebox.showerror("Create launcher", str(e))
+            messagebox.showerror("Create launcher", tr_line(str(e)))
             return
         where = "\n".join(self._short(p) for p in made)
-        tip = {"darwin": "Open it from Applications in your home folder, or drag it to the Dock."}.get(
-            sys.platform, "Double-click it to open ursoTTS without a terminal.")
-        self.log(f"Created launcher: {where}\n", "accent")
-        messagebox.showinfo("Launcher created", f"Created:\n{where}\n\n{tip}")
+        tip = {"darwin": tr("Open it from Applications in your home folder, or drag it to the Dock.")}.get(
+            sys.platform, tr("Double-click it to open ursoTTS without a terminal."))
+        self.log(tr("Created launcher: {where}", where=where) + "\n", "accent")
+        messagebox.showinfo("Launcher created", tr("Created:\n{where}", where=where) + "\n\n" + tip)
+
+    def set_theme(self, name: str):
+        """Switch theme: saved, then the window restarts (script, folders and layout are kept)."""
+        if name == self.theme:
+            return
+        previous, self.theme = self.theme, name
+        self.theme_var.set(name)
+        self.restart()                           # asks first about unsaved changes or running work
+        self.theme = previous                    # only reached when the restart was cancelled
+        self.theme_var.set(previous)
+
+    def set_ui_language(self, code: str):
+        """View > Language: save the choice, then restart so every label is rebuilt."""
+        self.ui_choice = code
+        self.lang_var.set(code)
+        if code == i18n.get_language():          # already showing it: just remember the choice
+            self._save_layout()
+            return
+        # the question is shown in both languages so it reads right whichever one is active now
+        if messagebox.askyesno("Language / 언어", i18n.both("Restart ursoTTS to apply."), icon="question", default="yes"):
+            self.restart()                       # asks about unsaved changes or running work first
+        self._save_layout()                      # not restarted: the choice applies at the next launch
+
+    def pick_theme(self):
+        """A small VS Code–style quick pick: arrow keys to choose, Enter to apply, Esc to close."""
+        win = tk.Toplevel(self.root, bg=BORDER, padx=1, pady=1)
+        win.title(tr("Color Theme"))
+        win.transient(self.root)
+        win.resizable(False, False)
+        inner = tk.Frame(win, bg=SIDEBAR)
+        inner.pack(fill="both", expand=True)
+        self.label(inner, "  " + tr("Select Color Theme"), "head", fg=FG_DIM, pady=8).pack(fill="x")
+        names = list(THEMES)
+        lb = tk.Listbox(inner, height=len(names), bg=SIDEBAR, fg=FG, font=self.fonts["ui"], relief="flat",
+                        highlightthickness=0, selectbackground=SELECT, selectforeground=FG_BRIGHT,
+                        activestyle="none", width=26)
+        for n in names:
+            lb.insert("end", f"  {n}" + (tr("   (current)") if n == self.theme else ""))
+        lb.pack(fill="both", padx=6, pady=(0, 8))
+        i = names.index(self.theme)
+        lb.selection_set(i)
+        lb.activate(i)
+        lb.focus_set()
+        def choose(_e=None):
+            sel = lb.curselection()
+            win.destroy()
+            if sel:
+                self.set_theme(names[sel[0]])
+        lb.bind("<Return>", choose)
+        lb.bind("<Double-Button-1>", choose)
+        win.bind("<Escape>", lambda e: win.destroy())
+        win.update_idletasks()
+        x = self.root.winfo_rootx() + (self.root.winfo_width() - win.winfo_width()) // 2
+        win.geometry(f"+{x}+{self.root.winfo_rooty() + 80}")
 
     def ok_to_close(self) -> bool:
         if self.busy and not messagebox.askyesno(

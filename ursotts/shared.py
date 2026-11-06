@@ -9,7 +9,15 @@ from .text import KO_LETTERS, LETTER_NAMES, number_words
 
 
 class UserError(Exception):
-    """A problem the user can fix; each front end shows it in its own way."""
+    """A problem the user can fix; each front end shows it in its own way.
+
+    `message` is the English text and may contain {placeholders} filled from `fmt`;
+    str(error) is the finished English sentence. The desktop app translates
+    (message, fmt) through i18n.tr_exc."""
+
+    def __init__(self, message: str, **fmt):
+        super().__init__(message.format(**fmt) if fmt else message)
+        self.key, self.fmt = message, fmt
 
 
 LANGS = {"Auto (English + Korean)": "auto", "English": "en", "Korean": "ko"}
@@ -84,7 +92,8 @@ def prepare_sample(path: str, out_dir: Path) -> str:
             raise UserError("Install ffmpeg to use this file type, or upload a WAV file.")
     seconds = len(audio.read_wav(dst)[0]) / audio.read_wav(dst)[1]
     if seconds < 3:
-        raise UserError(f"The sample is only {seconds:.1f} s long. Record 10–30 seconds of speech.")
+        raise UserError("The sample is only {seconds:.1f} s long. Record 10–30 seconds of speech.",
+                         seconds=seconds)
     return str(dst)
 
 

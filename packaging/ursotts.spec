@@ -19,6 +19,10 @@ datas = [
     (str(ROOT / "examples"), "defaults/examples"),
 ]
 binaries, hiddenimports = [], ["ursotts.app", "ursotts.engine", "tkinter"]
+# ursotts/assets/ is bundled whole, including default_lang.txt when the build script wrote it
+# ("ko" for the Korean edition; absent = English). It sets the installed app's default language.
+_lang_file = ROOT / "ursotts" / "assets" / "default_lang.txt"
+print("ursoTTS build language:", _lang_file.read_text(encoding="utf-8").strip() if _lang_file.exists() else "en (no default_lang.txt)")
 
 # The voice engine and its helpers ship data files and lazily imported modules,
 # so collect them whole. Packages that aren't installed are skipped.

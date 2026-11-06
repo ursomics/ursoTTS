@@ -1,6 +1,6 @@
-# Builds the installers (macOS .dmg and Windows setup .exe) and attaches them
-# to a GitHub Release. Runs when you publish a release on GitHub, or manually
-# from the Actions tab (then the files are kept as workflow artifacts).
+# Builds the installers (macOS .dmg and Windows setup .exe, English and Korean "_ko")
+# and attaches them to a GitHub Release. Runs when you publish a release on GitHub,
+# or manually from the Actions tab (then the files are kept as workflow artifacts).
 name: release
 on:
   release:
@@ -13,15 +13,19 @@ permissions:
 jobs:
   macos:
     runs-on: macos-latest          # Apple Silicon
+    strategy:
+      fail-fast: false
+      matrix:
+        lang: [en, ko]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: bash packaging/build_mac.sh
+      - run: bash packaging/build_mac.sh ${{ matrix.lang == 'ko' && '--ko' || '' }}
       - uses: actions/upload-artifact@v4
         with:
-          name: ursoTTS-macOS
+          name: ursoTTS-macOS-${{ matrix.lang }}
           path: dist/*.dmg
       - if: github.event_name == 'release'
         run: gh release upload "${{ github.event.release.tag_name }}" dist/*.dmg --clobber
@@ -30,19 +34,23 @@ jobs:
 
   windows:
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        lang: [en, ko]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: choco install innosetup -y --no-progress
-      - run: powershell -ExecutionPolicy Bypass -File packaging\build_windows.ps1
+      - run: powershell -ExecutionPolicy Bypass -File packaging\build_windows.ps1 ${{ matrix.lang == 'ko' && '-Ko' || '' }}
       - uses: actions/upload-artifact@v4
         with:
-          name: ursoTTS-Windows
-          path: dist/*-windows-setup.exe
+          name: ursoTTS-Windows-${{ matrix.lang }}
+          path: dist/*-windows-setup*.exe
       - if: github.event_name == 'release'
         shell: bash
-        run: gh release upload "${{ github.event.release.tag_name }}" dist/*-windows-setup.exe --clobber
+        run: gh release upload "${{ github.event.release.tag_name }}" dist/*-windows-setup*.exe --clobber
         env:
           GH_TOKEN: ${{ github.token }}
