@@ -12,6 +12,12 @@ VOL="ursoTTS ${VERSION}"
 STAGE=dist/dmg && rm -rf "$STAGE" && mkdir -p "$STAGE"
 cp -R dist/ursoTTS.app "$STAGE/"
 
+# Re-sign the whole app consistently (ad-hoc, no Apple account needed). Without this,
+# macOS can stall for a very long time when first opening the large PyInstaller bundle.
+chmod -R u+w "$STAGE/ursoTTS.app"
+codesign --force --deep --sign - "$STAGE/ursoTTS.app"
+codesign --verify --deep --strict "$STAGE/ursoTTS.app"
+
 # Installer window background: warm panel with an arrow from the app to Applications.
 python3 - <<'PY'
 from PIL import Image, ImageDraw, ImageFont
