@@ -84,7 +84,7 @@ Get the installer for your computer from the [latest release](https://github.com
 | **Mac** (Apple Silicon) | `ursoTTS-1.0.0-mac-arm64.dmg` | Open it and drag **ursoTTS** into **Applications** |
 | **Windows** (64-bit) | `ursoTTS-1.0.0-windows-setup.exe` | Run it and follow the steps |
 
-- **First open:** the app isn't signed with a paid developer certificate yet, so your computer asks for confirmation once. Mac: right-click ursoTTS → **Open** → **Open**. Windows: **More info** → **Run anyway**.
+- **First open:** the app isn't signed with a paid developer certificate yet, so your computer asks for confirmation once. **Mac:** click **Done** on the warning, open **System Settings → Privacy & Security**, scroll to **Security**, and click **Open Anyway** (on older macOS: right-click ursoTTS → **Open** → **Open**). **Windows:** **More info** → **Run anyway**.
 - **First narration** downloads the voice model (a few GB) once, so you need an internet connection the first time.
 - Your files live in a **`ursoTTS`** folder in your home folder: put voice samples in `voices/`, scripts in `scripts/`, and find results in `output/`.
 
