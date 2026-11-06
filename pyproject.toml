@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ursotts"
-version = "0.6.7"
-description = "Batch voice-cloned narration (English + Korean) for video creators, with a CLI and a web UI, built on open-source TTS."
+version = "1.0.0"
+description = "Batch voice-cloned narration (English + Korean) for video creators, with a CLI, a web UI and a desktop app, built on open-source TTS."
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Ursus (@ursomics)" }]
 requires-python = ">=3.10"
-dependencies = ["numpy", "soundfile", "pyyaml"]
+dependencies = ["numpy", "soundfile", "pyyaml", "imageio-ffmpeg"]   # imageio-ffmpeg: bundled ffmpeg fallback
 
 [project.optional-dependencies]
 # setuptools<81: Chatterbox's watermarker (resemble-perth) still imports pkg_resources,
@@ -26,4 +26,4 @@ ursotts = "ursotts.cli:main"
 packages = ["ursotts"]
 
 [tool.setuptools.package-data]
-ursotts = ["assets/*.png"]
+ursotts = ["assets/*/*", "assets/*/*/*"]

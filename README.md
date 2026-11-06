@@ -30,7 +30,7 @@
 
 ---
 
-**Batch voice-cloned narration for video creators.** Write your scripts as plain text files, record your voice once, and get finished narration (WAV + MP3 + subtitles) for every video. It runs on your own machine with open-source models, so there are no per-character credits. Use it from the command line or from a simple web page in your browser.
+**ursoTTS™: batch voice-cloned narration for video creators.** Write your scripts as plain text files, record your voice once, and get finished narration (WAV + MP3 + subtitles) for every video. It runs on your own machine with open-source models, so there are no per-character credits. Use it as a desktop app, from a simple web page in your browser, or from the command line.
 
 Built for the [@ursomics](https://youtube.com/@ursomics) bioinformatics video series (English + Korean), and developed with Claude Code.
 
@@ -74,6 +74,21 @@ Cloud voice-cloning services charge per character. That adds up quickly across a
 - **Accessibility:** audio versions of documents, with subtitles for viewers who read along.
 
 Only clone your own voice, or a voice you have permission to use.
+
+## Download the app (no Python needed)
+
+Get the installer for your computer from the [latest release](https://github.com/ursomics/ursotts/releases/latest):
+
+| Computer | File | Install |
+|---|---|---|
+| **Mac** (Apple Silicon) | `ursoTTS-1.0.0-mac-arm64.dmg` | Open it and drag **ursoTTS** into **Applications** |
+| **Windows** (64-bit) | `ursoTTS-1.0.0-windows-setup.exe` | Run it and follow the steps |
+
+- **First open:** the app isn't signed with a paid developer certificate yet, so your computer asks for confirmation once. Mac: right-click ursoTTS → **Open** → **Open**. Windows: **More info** → **Run anyway**.
+- **First narration** downloads the voice model (a few GB) once, so you need an internet connection the first time.
+- Your files live in a **`ursoTTS`** folder in your home folder: put voice samples in `voices/`, scripts in `scripts/`, and find results in `output/`.
+
+Prefer the command line or the web UI? Install from source with the quick start below.
 
 ## Quick start
 
@@ -120,6 +135,16 @@ It follows your system's light or dark mode.
 
 A step-by-step guide to every tab is in the [manual](docs/MANUAL.md#6-using-the-web-ui).
 
+### As a desktop app
+
+<p align="center"><img src="docs/images/app-speak.png" alt="The ursoTTS desktop app" width="92%"></p>
+
+```bash
+ursotts app
+```
+
+The same Speak, Pronunciation and Batch features in a native window styled like VS Code Dark: activity bar, resizable sidebar, script editor with line numbers, and an OUTPUT panel with the live log. A built-in **Claude Code** view lets you restyle or extend the app by asking in plain words, with one-click Undo. See the [manual](docs/MANUAL.md#7-using-the-ursotts-desktop-app).
+
 ### From the terminal
 
 ```bash
@@ -165,7 +190,7 @@ en:
   RNA-seq: R.N.A. seek
 ```
 
-Test scripts full of gene names are in `examples/`. See the [manual](docs/MANUAL.md#83-fix-pronunciation) for the full guide, including how to describe a sound to Claude.
+Test scripts full of gene names are in `examples/`. See the [manual](docs/MANUAL.md#93-fix-pronunciation) for the full guide, including how to describe a sound to Claude.
 
 ## Script format
 
@@ -225,3 +250,5 @@ Not affiliated with or endorsed by Anthropic. Claude and Claude Code are tradema
   <img src="docs/brand/avatar_160.png" width="72" alt="ursoTTS bear"><br>
   <sub>Made with <img src="docs/brand/avatar_160.png" height="18" alt="ursoTTS bear"> by <a href="https://github.com/ursomics">ursomics@GitHub</a> · <a href="https://ursomics.com">ursomics.com</a> · <a href="https://youtube.com/@ursomics">@ursomics</a></sub>
 </p>
+
+The bundled **Poppins** font is © The Poppins Project Authors, under the SIL Open Font License 1.1 (`ursotts/assets/fonts/OFL.txt`).

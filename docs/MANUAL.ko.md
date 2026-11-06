@@ -6,7 +6,7 @@
   <img src="brand/ursotts_logo_360.png" width="180" alt="ursoTTS 로고">
 </p>
 
-<h1 align="center">ursoTTS 매뉴얼</h1>
+<h1 align="center">ursoTTS™ 매뉴얼</h1>
 
 <p align="center">
   <b>빈 폴더에서 완성된 내레이션까지, 한 단계씩.</b><br>
@@ -16,6 +16,23 @@
 ---
 
 이 매뉴얼은 빈 폴더에서 시작해 실제 영상에 쓸 내레이션을 완성하기까지 안내합니다. 프로그래밍 경험이 없어도 됩니다. 코드가 필요한 단계에서는 **Claude Code**에게 맡기는 방법을 보여 줍니다.
+
+> **📖 이 매뉴얼 읽는 법**
+>
+> - **가장 쉬운 방법:** [GitHub에서](https://github.com/ursomics/ursotts/blob/main/docs/MANUAL.ko.md) 읽으세요. 모든 것이 의도한 대로 보입니다.
+> - **내 컴퓨터에서:** **VS Code**로 열고 **Cmd+Shift+V**(Windows: **Ctrl+Shift+V**)를 누르면 미리 보기가 열립니다. **Cmd+K** 다음 **V**를 누르면 나란히 볼 수 있습니다. 스크린샷이 보이도록 `ursotts` 폴더 안에서 여세요.
+> - **다른 앱:** Typora(읽기와 편집을 한 화면에서), Obsidian(무료), QLMarkdown(무료, Finder에서 파일을 선택하고 **Space**).
+> - 라이트/다크 배너나 일부 가운데 정렬 같은 몇 가지는 GitHub에서만 정확히 보입니다.
+
+## 두 가지 상자
+
+| 코드 블록 표시 | 내용 | 입력 위치 |
+|---|---|---|
+| `bash` 표시 | 터미널 명령어 | `ursotts` 폴더에서 일반 터미널 프롬프트(`%`)나 VS Code 터미널(**Ctrl+~**)에 입력합니다. Claude 세션 안에는 입력하지 않습니다 |
+| 표시 없음 | Claude에게 보내는 프롬프트 또는 참고용 출력 예시 | Claude Code 채팅창(VS Code 패널, Claude Desktop 앱 또는 Claude Code CLI) |
+
+- `bash` 표시는 글자 색만 정합니다. Mac 터미널은 **zsh**를 쓰며, 명령어는 똑같이 작동합니다.
+- **Claude Code CLI**도 터미널 창에서 실행되지만, `claude`를 입력해 시작하는 Claude와의 채팅입니다. 거기서 명령어를 입력하면 Claude에게 보내는 메시지가 됩니다. 일반 프롬프트로 돌아가려면 먼저 `/exit`를 입력하세요.
 
 ## 활용 예
 
@@ -37,12 +54,13 @@
 1. [준비물](#1-준비물)
 2. [프로젝트를 컴퓨터에 받기](#2-프로젝트를-컴퓨터에-받기)
 3. [ursoTTS를 쓰는 방법](#3-ursotts를-쓰는-방법)
-4. [VS Code와 데스크톱 앱에서 Claude Code 쓰기](#4-vs-code와-데스크톱-앱에서-claude-code-쓰기)
+4. [VS Code와 Claude Desktop 앱에서 Claude Code 쓰기](#4-vs-code와-claude-desktop-앱에서-claude-code-쓰기)
 5. [Claude Code CLI 쓰기](#5-claude-code-cli-쓰기)
 6. [웹 UI 사용하기](#6-웹-ui-사용하기)
-7. [터미널에서 명령어 쓰기](#7-터미널에서-명령어-쓰기)
-8. [내레이션 만들기](#8-내레이션-만들기)
-9. [문제 해결](#9-문제-해결)
+7. [ursoTTS 데스크톱 앱 쓰기](#7-ursotts-데스크톱-앱-쓰기)
+8. [터미널에서 명령어 쓰기](#8-터미널에서-명령어-쓰기)
+9. [내레이션 만들기](#9-내레이션-만들기)
+10. [문제 해결](#10-문제-해결)
 
 ---
 
@@ -54,7 +72,7 @@
 | Python 3.10 이상 | Python 3.13에서 테스트했습니다. Claude Code가 대신 설치해 줄 수 있습니다. |
 | ffmpeg | MP3로 내보낼 때 필요합니다. Mac에서는 `brew install ffmpeg` 명령으로 설치합니다. 만약 ffmpeg이 없어도 WAV와 자막은 만들어집니다. |
 | Claude 유료 요금제 | Claude Code를 쓰려면 Pro, Max, Ultra, Team, Enterprise 중 하나가 필요합니다 (Free에서는 사용 불가). |
-| 내 목소리 샘플 | 언어마다 10~30초 분량의 깨끗한 음성이 필요합니다 ([8.1](#81-목소리-샘플-녹음하기) 참고). |
+| 내 목소리 샘플 | 언어마다 10~30초 분량의 깨끗한 음성이 필요합니다 ([9.1](#91-목소리-샘플-녹음하기) 참고). |
 
 <sub>[↑ 목차로](#목차)</sub>
 
@@ -68,33 +86,34 @@
 
 > **Mac 팁:** 시스템 설정에서 *iCloud → Drive → 데스크탑 및 문서 폴더*가 켜져 있으면 문서와 데스크탑 폴더가 동기화됩니다. 켜져 있다면 `~/Projects` 같은 폴더를 쓰세요. 이것 때문에 설정을 끄지는 마세요. 끄면 macOS가 기존 파일을 iCloud Drive에 남겨 두고 로컬에는 빈 폴더만 줍니다.
 
-> **설치한 뒤에는 폴더 이름을 바꾸거나 옮기지 마세요.** 가상환경은 자기 전체 경로를 기억하고 있어서, 옮기면 망가집니다. 옮겼다면 `.venv`를 지우고 다시 만드세요 ([4.7](#47-claude-code로-ursotts-설치하기) 3단계 참고).
+> **설치한 뒤에는 폴더 이름을 바꾸거나 옮기지 마세요.** 가상환경은 자기 전체 경로를 기억하고 있어서, 옮기면 망가집니다. 옮겼다면 `.venv`를 지우고 다시 만드세요 ([4.7](#47-claude-code로-ursotts-설치하기-vs-code와-데스크톱-앱) 3단계 참고).
 
 <sub>[↑ 목차로](#목차)</sub>
 
 ## 3. ursoTTS를 쓰는 방법
 
-ursoTTS는 세 가지 방법으로 쓸 수 있습니다. 세 방법 모두 같은 설정, 목소리 샘플, 발음 규칙을 쓰므로 자유롭게 섞어 써도 됩니다.
+ursoTTS는 네 가지 방법으로 쓸 수 있습니다. 네 방법 모두 같은 설정, 목소리 샘플, 발음 규칙을 쓰므로 자유롭게 섞어 써도 됩니다.
 
 | 방법 | 하는 일 | 잘 맞는 경우 | 장 |
 |---|---|---|---|
-| **Claude Code** | Claude에게 말로 요청하면 ursoTTS를 대신 실행하고 문제도 고쳐 줌 | 설치, 수정, 발음 고치기, 직접 입력하기 싫은 모든 일 | [4](#4-vs-code와-데스크톱-앱에서-claude-code-쓰기), [5](#5-claude-code-cli-쓰기) |
+| **Claude Code** | Claude에게 말로 요청하면 ursoTTS를 대신 실행하고 문제도 고쳐 줌 | 설치, 수정, 발음 고치기, 직접 입력하기 싫은 모든 일 | [4](#4-vs-code와-claude-desktop-앱에서-claude-code-쓰기), [5](#5-claude-code-cli-쓰기) |
 | **웹 UI** | 브라우저에서 버튼을 누름 | 문장 시험, 목소리 녹음, 발음 비교 | [6](#6-웹-ui-사용하기) |
-| **터미널** | `ursotts` 명령어를 직접 입력 | 빠른 반복 작업, 원격 컴퓨터 | [7](#7-터미널에서-명령어-쓰기) |
+| **ursoTTS 데스크톱 앱** | 같은 기능을 일반 창에서. Python 없이 설치하는 설치 파일도 있음 | 매일 쓰는 내레이션, 브라우저나 Python을 쓰고 싶지 않은 분 | [7](#7-ursotts-데스크톱-앱-쓰기) |
+| **터미널** | `ursotts` 명령어를 직접 입력 | 빠른 반복 작업, 원격 컴퓨터 | [8](#8-터미널에서-명령어-쓰기) |
 
 **Claude Code는 세 곳에서 실행됩니다.** 어디서나 같은 Claude Code이고 설정, 스킬, `CLAUDE.md`를 공유하므로 언제든 바꿔 써도 됩니다:
 
 | 어디서 | 모습 | 장 |
 |---|---|---|
-| **VS Code 확장** (추천) | 파일과 변경 내용 옆의 채팅 패널 | [4](#4-vs-code와-데스크톱-앱에서-claude-code-쓰기) |
-| **Claude Desktop 앱** (Code 탭) | 채팅 상자가 있는 올인원 앱 | [4](#4-vs-code와-데스크톱-앱에서-claude-code-쓰기) |
+| **VS Code 확장** (추천) | 파일과 변경 내용 옆의 채팅 패널 | [4](#4-vs-code와-claude-desktop-앱에서-claude-code-쓰기) |
+| **Claude Desktop 앱** (Code 탭) | 채팅 상자가 있는 올인원 앱 | [4](#4-vs-code와-claude-desktop-앱에서-claude-code-쓰기) |
 | **Claude Code CLI** | 같은 채팅을 터미널 창 안에서 | [5](#5-claude-code-cli-쓰기) |
 
-> Claude Code CLI도 Claude와 말로 대화하는 것이고, 겉모습만 터미널입니다. Claude 없이 `ursotts` 명령어를 직접 입력하는 방법은 [7장](#7-터미널에서-명령어-쓰기)입니다.
+> Claude Code CLI도 Claude와 말로 대화하는 것이고, 겉모습만 터미널입니다. Claude 없이 `ursotts` 명령어를 직접 입력하는 방법은 [8장](#8-터미널에서-명령어-쓰기)입니다.
 
 <sub>[↑ 목차로](#목차)</sub>
 
-## 4. VS Code와 데스크톱 앱에서 Claude Code 쓰기
+## 4. VS Code와 Claude Desktop 앱에서 Claude Code 쓰기
 
 VS Code와 데스크톱 앱 모두 채팅 상자에 말로 요청을 입력합니다. 편한 쪽을 설정하세요 ([4.1](#41-vs-code에-claude-code-설정하기-추천) 또는 [4.2](#42-claude-desktop-앱-설정하기-code-탭) 참고). [4.3](#43-권한-모드-고르기)부터는 두 곳 모두, 그리고 CLI ([5장](#5-claude-code-cli-쓰기) 참고)에서도 똑같이 쓸 수 있습니다.
 
@@ -201,6 +220,8 @@ VS Code와 데스크톱 앱 모두 채팅 상자에 말로 요청을 입력합�
 짧은 세 문장으로 설명해 줘.
 ```
 
+![Claude Desktop 입력창의 요청](images/KO_4.2_step4_prompt.png)
+
 ![새 세션: (1) 프로젝트 폴더, (2) 요청, (3) 모드](images/desktop-04-session-prompt.png)
 
 **5단계: 답변 읽기.**
@@ -218,23 +239,23 @@ VS Code와 데스크톱 앱 모두 채팅 상자에 말로 요청을 입력합�
 
 모드는 입력창 아래쪽에 표시됩니다. 눌러서, 또는 **Shift+Tab**으로 바꿉니다.
 
-| 모드 | 동작 | 쓸 때 |
+| 모드 | 동작 | 적합한 상황 |
 |---|---|---|
-| **Manual** | 편집과 대부분의 명령마다 승인을 요청 | 익숙해지는 중이거나, 삭제·설치 작업 |
-| **Edit automatically** | 묻지 않고 파일을 편집(VS Code에서는 선택한 텍스트나 파일 전체) | 나중에 검토할 작고 위험이 적은 편집 |
-| **Plan** | 코드를 살펴보고 편집 전에 계획을 제시 | 새로운 작업을 시작할 때 |
-| **Auto** | 안전 검사를 통과한 작업은 승인하고, 위험한 것은 멈춤 | 믿고 맡기는 반복 작업 |
+| **Manual** | 편집하거나 대부분의 명령을 실행하기 전에 승인을 요청합니다 | 사용법을 익히는 중일 때, 삭제·설치 작업을 할 때 |
+| **Edit automatically** | 승인 없이 파일을 편집합니다. VS Code에서는 선택한 텍스트나 파일 전체를 편집합니다 | 나중에 검토할 수 있는 작고 위험이 적은 편집을 할 때 |
+| **Plan** | 코드를 살펴보고 편집 전에 계획을 제시합니다 | 새로운 작업을 시작할 때 |
+| **Auto** | 안전 검사를 통과한 작업은 자동으로 승인하고, 위험한 작업은 중단합니다 | 믿고 맡길 수 있는 반복 작업을 할 때 |
 
 같은 메뉴에서 **Effort** 수준도 정합니다. Effort가 높을수록 Claude가 답하기 전에 오래 생각해서 어려운 문제에 도움이 되지만, 시간과 사용량이 더 듭니다. 목록은 VS Code와 데스크톱 앱에서 조금 다를 수 있습니다.
 
 ### 4.4 Claude에게 맥락 알려 주기
 
-| 입력 | Claude가 받는 것 |
+| 입력 | Claude가 참고하는 내용 |
 |---|---|
-| `@README.md` | 그 파일 |
-| `@ursotts/` | 폴더 전체(끝의 슬래시에 주의) |
-| `@ursotts/engine.py#30-60` | 30~60번째 줄만 |
-| `@terminal:zsh` | *zsh*라는 터미널의 출력. 오류를 복사할 필요가 없습니다 |
+| `@README.md` | 해당 파일 |
+| `@ursotts/` | 폴더 전체(끝의 슬래시를 붙입니다) |
+| `@ursotts/engine.py#30-60` | 30~60번째 줄 |
+| `@terminal:zsh` | *zsh*라는 터미널의 출력. 오류 메시지를 직접 복사하지 않아도 됩니다 |
 
 - 편집기에서 선택한 텍스트는 자동으로 전달됩니다. **Option+K**(Mac) 또는 **Alt+K**를 누르면 `@text.py#40-55` 같은 정확한 참조가 들어갑니다.
 - 스크린샷은 입력창에 바로 붙여 넣으세요. 파일은 **Shift**를 누른 채 끌어다 놓으면 첨부됩니다.
@@ -246,17 +267,17 @@ VS Code와 데스크톱 앱 모두 채팅 상자에 말로 요청을 입력합�
 
 입력창에 `/`를 입력하면 모든 명령어가 나옵니다. VS Code, 데스크톱 앱, CLI에서 똑같이 쓸 수 있습니다.
 
-| 명령어 | 하는 일 | 쓸 때 |
+| 명령어 | 기능 | 사용하면 좋을 때 |
 |---|---|---|
-| `/init` | Claude가 세션마다 처음에 읽는 메모인 `CLAUDE.md`를 만듭니다 | 내 프로젝트를 새로 시작할 때(ursoTTS에는 이미 들어 있음) |
-| `/clear` | 대화를 새로 시작합니다. `CLAUDE.md`는 그대로 | 관계없는 다른 작업으로 넘어갈 때 |
-| `/compact` | 긴 대화를 요약해 공간을 확보합니다 | 대화가 길어져 Claude가 앞 내용을 놓치기 시작할 때 |
-| `/plan` | Plan 모드로 바꿉니다 | 큰 변경 전에 계획부터 보고 싶을 때 |
-| `/model` | 모델을 고릅니다 | 더 강한 모델이 필요한 어려운 문제 |
-| `/usage` | 요금제 한도와 초기화 시점을 봅니다 | 긴 작업을 시작하기 전 |
-| `/btw` | 본 대화를 어지럽히지 않고 곁가지 질문을 합니다 | `/btw cfg_weight가 뭐야?` |
+| `/init` | Claude가 세션을 시작할 때마다 읽는 메모인 `CLAUDE.md`를 만듭니다 | 새 프로젝트를 시작할 때(ursoTTS에는 이미 포함되어 있습니다) |
+| `/clear` | 대화를 새로 시작합니다. `CLAUDE.md`는 유지됩니다 | 다른 작업으로 넘어갈 때 |
+| `/compact` | 긴 대화를 요약해 대화 공간을 확보합니다 | 대화가 길어져 Claude가 앞 내용을 놓치기 시작할 때 |
+| `/plan` | Plan 모드로 전환합니다 | 큰 변경을 하기 전에 계획부터 확인하고 싶을 때 |
+| `/model` | 사용할 모델을 선택합니다 | 어려운 문제에 더 강력한 모델이 필요할 때 |
+| `/usage` | 요금제 한도와 초기화 시점을 확인합니다 | 긴 작업을 시작하기 전에 |
+| `/btw` | 본 대화의 흐름을 끊지 않고 곁가지 질문을 합니다 | `/btw cfg_weight가 뭐야?`처럼 간단한 질문이 있을 때 |
 | `/logout` | 로그아웃합니다 | 계정을 바꿀 때 |
-| `/help` | 모든 명령어와 단축키를 봅니다 | 헷갈릴 때 언제든 |
+| `/help` | 명령어와 단축키 목록을 확인합니다 | 사용법이 헷갈릴 때 언제든지 |
 
 ### 4.6 안전장치
 
@@ -264,7 +285,7 @@ VS Code와 데스크톱 앱 모두 채팅 상자에 말로 요청을 입력합�
 - **세션 기록:** 패널 위쪽의 시계 버튼으로 지난 대화를 봅니다.
 - **탭 나누기:** 다른 작업은 명령 팔레트 (**Cmd+Shift+P**)의 *Open in New Tab*으로 열어 대화가 섞이지 않게 합니다.
 
-### 4.7 Claude Code로 ursoTTS 설치하기
+### 4.7 Claude Code로 ursoTTS 설치하기 (VS Code와 데스크톱 앱)
 
 원하는 Claude Code 환경에서 `ursotts` 폴더를 열고, 아래 프롬프트를 순서대로 붙여 넣으세요. 명령마다 직접 승인하도록 먼저 **Manual** 모드로 바꿉니다.
 
@@ -274,11 +295,15 @@ VS Code와 데스크톱 앱 모두 채팅 상자에 말로 요청을 입력합�
 아니니 쉽게 설명해 달라.
 ```
 
+![1단계: Claude 패널의 요청](images/KO_4.7_step1_prompt.png)
+
 **2단계: 프로젝트 이해하기**(Plan 모드)
 ```
 @README.md, @config.yaml, @ursotts/를 읽고 scripts/의 대본이 어떻게 MP3가
 되는지 쉽게 설명해 줘. 아무것도 바꾸지 마.
 ```
+
+![2단계: Claude 패널의 요청](images/KO_4.7_step2_prompt.png)
 
 **3단계: 설치**
 ```
@@ -287,24 +312,49 @@ VS Code와 데스크톱 앱 모두 채팅 상자에 말로 요청을 입력합�
 설치한 다음, `ursotts check`를 실행해서 내 목소리 샘플 말고 빠진 것이 있으면
 고쳐 줘.
 ```
+
+![3단계: Claude 패널의 설치 요청](images/KO_4.7_step3_prompt.png)
+
 설치할 때 용량이 큰 PyTorch를 내려받으므로 시간이 좀 걸립니다.
 
-**4단계: 목소리 추가.** 샘플을 `voices/`에 넣은 다음 ([8.1](#81-목소리-샘플-녹음하기) 참고):
+끝나면 Claude가 남은 할 일을 정리해 주고, 새 터미널 창마다 실행할 두 줄도 알려 줍니다:
+
+![설치 후 Claude의 요약: 남은 할 일](images/4.7_step3.2_panel_EN.png)
+
+![같은 요약과, 그 두 줄을 실행한 VS Code 터미널](images/4.7_step3.3_panel_EN.png)
+
+**4단계: 목소리 추가.** 샘플을 `voices/`에 넣은 다음 ([9.1](#91-목소리-샘플-녹음하기) 참고):
 ```
 `ursotts check`를 다시 실행해서 두 목소리가 모두 OK로 나오는지 확인해 줘.
 ```
+
+![4단계: Claude 패널의 요청](images/KO_4.7_step4_prompt.png)
+
+Claude가 녹음과 파일 이름 짓는 법을 알려 주고, `voices` 폴더에 두 샘플이 들어가면 확인 결과가 나옵니다:
+
+![목소리 샘플 녹음에 대한 Claude의 안내](images/4.7_step4.1_prompt_EN.png)
+
+![my_voice_en.wav와 my_voice_ko.wav가 들어 있는 voices 폴더](images/4.7_step4.2_voice_EN.png)
+
+![확인 결과: 두 목소리 모두 OK와 길이](images/4.7_step4.3_ok_EN.png)
 
 **5단계: 첫 테스트**
 ```
 실행해 줘: ursotts say "Welcome. Today we analyze scRNA-seq data." -o output/test1.wav
 실패하면 오류를 읽고 고친 다음 다시 실행해 줘.
 ```
+
+![5단계: 첫 테스트 요청](images/KO_4.7_step5_prompt.png)
+
 처음 실제로 실행할 때 Chatterbox 모델(몇 GB)을 내려받습니다. 그다음부터는 몇 초 만에 시작합니다.
 
 **6단계: 웹 UI 열기**
 ```
 `ursotts ui`로 웹 UI를 시작해 줘.
 ```
+
+![6단계: 웹 UI 시작 요청](images/KO_4.7_step6.1_prompt.png)
+
 탭마다 쓰는 법은 [6장](#6-웹-ui-사용하기) 참고.
 
 **문제가 생기면** 설명하지 말고, 가리키세요:
@@ -312,12 +362,16 @@ VS Code와 데스크톱 앱 모두 채팅 상자에 말로 요청을 입력합�
 마지막 명령이 실패했어. @terminal:zsh를 보고 원인을 찾아서 고쳐 줘.
 ```
 
-**발음이 이상하게 들리면** Claude Code에게 직접 고쳐 달라고 하세요 ([8.3](#83-발음-고치기) 참고):
+![문제가 생겼을 때의 요청](images/KO_4.7_step6.2_prompt.png)
+
+**발음이 이상하게 들리면** Claude Code에게 직접 고쳐 달라고 하세요 ([9.3](#93-발음-고치기) 참고):
 
 ```
 테스트에서 "TCRs"가 "티커스"처럼 들려. pronunciations.yaml에 프로젝트 방식으로
 항목을 추가하고, 같은 문장을 다시 만들어서 output/test2.wav로 저장해 줘.
 ```
+
+![발음 고치기 요청](images/KO_4.7_step6.3_prompt.png)
 
 요청 요령:
 
@@ -327,11 +381,40 @@ VS Code와 데스크톱 앱 모두 채팅 상자에 말로 요청을 입력합�
 - **고친 뒤 같은 문장을 다시 만들어** 전후를 비교해 달라고 하세요.
 - 고칠 단어가 여러 개면 **한 번에 목록으로** 요청해도 됩니다.
 
+### 4.8 새 버전으로 업데이트하기
+
+처음부터 다시 할 필요는 없습니다. `.venv`, 내려받은 목소리 모델, 목소리 샘플은 그대로 두고 프로젝트 파일만 바꿉니다.
+
+**zip 파일을 내려받았다면** `ursotts` 폴더를 연 Claude Code에 붙여 넣으세요:
+
+```
+새 ursotts.zip을 ~/Downloads에 내려받았어. 임시 폴더에 압축을 풀고 파일들을
+이 프로젝트에 복사해 줘. 단, voices/ 폴더는 그대로 두고, pronunciations.yaml과
+config.yaml은 합쳐 줘(내가 넣은 항목과 설정은 유지). 그다음 .venv에서
+pip install -e ".[all]"을 실행하고 `ursotts check`를 실행해 줘.
+```
+
+![zip으로 업데이트하는 요청](images/KO_4.8.1_prompt.png)
+
+![업데이트 프롬프트 후 Claude의 요약: 모든 확인 통과](images/4.8_update01-prompt.png)
+
+**GitHub에서 프로젝트를 받았다면(clone):**
+
+```
+git pull로 GitHub에서 이 프로젝트를 업데이트해 줘. voices/ 폴더와
+pronunciations.yaml, config.yaml에 내가 넣은 항목은 유지해 줘. 그다음 .venv에서
+pip install -e ".[all]"을 실행하고 `ursotts check`를 실행해 줘.
+```
+
+![git pull로 업데이트하는 요청](images/KO_4.8.2_prompt.png)
+
+다시 설치하는 데는 잠깐이면 되고, 새 버전에 필요한 패키지도 함께 설치됩니다. 그다음 차례로 확인하세요: `ursotts check` → `ursotts ui` → `ursotts app`. 데스크톱 앱이 Tkinter가 없다고 하면 [7장](#7-ursotts-데스크톱-앱-쓰기)을 참고하세요.
+
 <sub>[↑ 목차로](#목차)</sub>
 
 ## 5. Claude Code CLI 쓰기
 
-Claude Code CLI는 [4장](#4-vs-code와-데스크톱-앱에서-claude-code-쓰기)과 같은 Claude Code를 터미널 창 안에서 쓰는 것입니다. 여전히 말로 요청을 입력하고, 모드 ([4.3](#43-권한-모드-고르기) 참고), 슬래시 명령어 ([4.5](#45-슬래시-명령어) 참고), `CLAUDE.md`도 똑같이 작동합니다. 다른 점은 모습뿐입니다. 글자만 있고 버튼이나 나란히 보는 변경 내용이 없습니다.
+Claude Code CLI는 [4장](#4-vs-code와-claude-desktop-앱에서-claude-code-쓰기)과 같은 Claude Code를 터미널 창 안에서 쓰는 것입니다. 여전히 말로 요청을 입력하고, 모드 ([4.3](#43-권한-모드-고르기) 참고), 슬래시 명령어 ([4.5](#45-슬래시-명령어) 참고), `CLAUDE.md`도 똑같이 작동합니다. 다른 점은 모습뿐입니다. 글자만 있고 버튼이나 나란히 보는 변경 내용이 없습니다.
 
 **이럴 때 좋습니다:** SSH로 원격 컴퓨터(클라우드 GPU나 연구실 서버)에서 작업할 때, 키보드가 편할 때, 이미 터미널에서 작업 중일 때.
 
@@ -343,12 +426,16 @@ Claude Code CLI는 [4장](#4-vs-code와-데스크톱-앱에서-claude-code-쓰�
 claude --version
 ```
 
+![터미널: claude --version으로 설치된 버전 확인](images/5.1_terminal.png)
+
 ### 5.2 세션 시작하기
 
 ```bash
 cd ~/Projects/ursotts      # 항상 프로젝트 폴더 안에서 시작
 claude
 ```
+
+![터미널에서 시작한 Claude Code CLI 세션](images/5.2_start_session.png)
 
 처음에는 로그인을 요청하고, 브라우저가 열리면 거기서 마칩니다. VS Code의 통합 터미널(**Ctrl+~**)에서도 `claude`를 실행할 수 있습니다.
 
@@ -361,13 +448,13 @@ claude
 - 여러 줄을 쓰려면 줄 끝에 `\`를 쓰고 **Enter**를 누릅니다.
 - 한국어는 VS Code 패널이나 데스크톱 앱에서 입력하는 게 더 편합니다. CLI에 붙여 넣는 것은 잘 됩니다.
 
-### 5.4 나갔다가 다시 이어 하기
+### 5.4 세션을 종료한 뒤 작업 이어 하기
 
-| 하려는 일 | 입력 |
+| 작업 | 입력 |
 |---|---|
-| 나가기 | `/exit`, 또는 **Ctrl+C** 두 번 |
+| 세션 종료 | `/exit`, 또는 **Ctrl+C** 두 번 |
 | 가장 최근 대화 이어 하기 | `claude --continue` |
-| 이전 대화 골라서 이어 하기 | `claude --resume` |
+| 이전 대화를 골라 이어 하기 | `claude --resume` |
 
 <sub>[↑ 목차로](#목차)</sub>
 
@@ -378,10 +465,10 @@ claude
 | 작업 | 웹 UI | 터미널 |
 |---|---|---|
 | 텍스트로 내레이션 만들기 | **Speak** 탭 | `ursotts say` |
-| 목소리 고르기·녹음하기 | **Speak** 탭 → *My saved voices* 또는 *Record or upload a new sample* | `config.yaml`의 `voices:` 수정 |
+| 목소리 선택·녹음 | **Speak** 탭 → *My saved voices* 또는 *Record or upload a new sample* | `config.yaml`의 `voices:` 항목 수정 |
 | 말투 조정 | **Speak** 탭 → *Speaking style* 슬라이더 | `config.yaml` 수정 |
-| 단어 발음 고치기 | **Pronunciation** 탭 | `pronunciations.yaml` 수정 |
-| 폴더 전체 생성 | **Batch** 탭 | `ursotts batch` |
+| 단어 발음 교정 | **Pronunciation** 탭 | `pronunciations.yaml` 수정 |
+| 폴더 단위로 생성 | **Batch** 탭 | `ursotts batch` |
 
 ### 6.1 시작하고 끄기
 
@@ -389,11 +476,16 @@ Claude Code에서 **시작**하기:
 ```
 `ursotts ui`로 웹 UI를 시작해 줘.
 ```
-또는 터미널에서, 프로젝트 폴더 안에서 ([7장](#7-터미널에서-명령어-쓰기) 참고):
+
+![웹 UI 시작 요청](images/KO_6.1_prompt.png)
+
+또는 터미널에서, 프로젝트 폴더 안에서 ([8장](#8-터미널에서-명령어-쓰기) 참고):
 ```bash
 source .venv/bin/activate
 ursotts ui
 ```
+
+![ursotts ui를 실행한 터미널](images/terminal-ui-start.png)
 
 브라우저에 **http://127.0.0.1:7860** 이 열립니다. 이 페이지는 내 컴퓨터에서만 실행되며, 아무것도 외부로 업로드되지 않습니다. 시스템의 라이트/다크 모드를 따라갑니다.
 
@@ -402,18 +494,18 @@ ursotts ui
 - **끄려면** 그 터미널에서 **Ctrl+C**를 누르거나, Claude Code에게 "웹 UI를 꺼 줘"라고 말합니다.
 - 페이지가 열리지 않으면 브라우저 주소창에 `http://127.0.0.1:7860`을 직접 입력하세요.
 
-| 옵션 | 하는 일 |
+| 옵션 | 기능 |
 |---|---|
-| `ursotts ui --port 7861` | 7860이 이미 쓰이고 있으면 다른 포트 사용 |
-| `ursotts ui --no-browser` | 브라우저 탭을 자동으로 열지 않음 |
-| `ursotts ui --engine dummy` | 목소리 모델 없이 페이지 테스트(신호음 재생) |
-| `ursotts ui --share` | 임시 **공개** 링크를 만듦. 의도한 경우에만 쓰세요 |
+| `ursotts ui --port 7861` | 기본 포트 7860을 사용할 수 없을 때 다른 포트로 실행합니다 |
+| `ursotts ui --no-browser` | 브라우저 탭을 자동으로 열지 않습니다 |
+| `ursotts ui --engine dummy` | 음성 모델 없이 페이지를 테스트합니다. 재생하면 신호음이 납니다 |
+| `ursotts ui --share` | 임시 **공개 링크**를 만듭니다. 공개를 의도한 경우에만 사용하세요 |
 
 ### 6.2 Speak 탭: 내레이션 만들기
 
 ![Speak 탭: (1) 대본, (2) 언어, (3) 목소리, (4) 저장된 목소리, (5) 생성, (6) 내레이션 재생, (7) 파일, (8) 말투(Speaking style)](images/webui-01-speak.png)
 
-1. **Script:** 내레이션을 붙여 넣습니다. 대본 파일과 똑같이, 빈 줄은 문단 사이 쉼, `[pause 1.5]`는 쉼, `#`으로 시작하는 줄은 건너뜁니다 ([8.2](#82-대본-쓰기) 참고).
+1. **Script:** 내레이션을 붙여 넣습니다. 대본 파일과 똑같이, 빈 줄은 문단 사이 쉼, `[pause 1.5]`는 쉼, `#`으로 시작하는 줄은 건너뜁니다 ([9.2](#92-대본-쓰기) 참고).
 2. **Language:** *Auto*는 문장마다 영어인지 한국어인지 감지합니다. *English*나 *Korean*을 고르면 `@lang en` / `@lang ko`처럼 전체를 한 언어, 한 목소리로 읽습니다.
 3. **Voice:** *My saved voices*는 `voices` 폴더의 샘플을 쓰고, *Record or upload a new sample*은 새 샘플을 씁니다 ([6.3](#63-다른-목소리-써-보기) 참고).
 4. **English voice / Korean voice:** 언어마다 `voices` 폴더의 샘플 파일을 고릅니다. 폴더에 새 파일을 넣었다면 **Refresh**를 누르세요.
@@ -437,19 +529,23 @@ ursoTTS가 샘플을 자동으로 변환하므로(모노, 24 kHz, 최대 30초) 
 
 ### 6.4 Speaking style (말투)
 
+![내려받기 목록 아래에 열린 Speaking style 패널](images/webui-05-speaking-style.png)
+
 내려받기 목록 아래의 **Speaking style**을 눌러 슬라이더를 엽니다(Speak 탭 그림의 8):
 
 | 슬라이더 | 효과 |
 |---|---|
-| **Expressiveness** | 낮을수록 강의처럼 차분하고, 높을수록 생동감 있음 |
-| **Pacing** | 낮을수록 느리고 또박또박 |
-| **Variation** | 높을수록 말투가 다양해짐 |
-| **Seed** | 같은 seed면 같은 결과. 바꾸면 다른 버전을 들을 수 있음 |
+| **Expressiveness** | 값을 낮추면 강의처럼 차분하게, 높이면 더 생동감 있게 말합니다 |
+| **Pacing** | 값을 낮추면 더 느리고 또박또박 말합니다 |
+| **Variation** | 값을 높이면 말투가 더 다양해집니다 |
+| **Seed** | 같은 값을 사용하면 같은 결과를 얻습니다. 값을 바꾸면 다른 버전을 들어볼 수 있습니다 |
 
 바꾼 값은 다음 생성부터 적용되고, 웹 UI를 끌 때까지 유지됩니다. `config.yaml`에는 저장되지 않습니다. 마음에 드는 설정을 찾으면 Claude Code에게 옮겨 달라고 하세요:
 ```
 @config.yaml에 exaggeration 0.4, cfg_weight 0.45, seed 7을 설정해 줘.
 ```
+
+![말투 설정을 config.yaml에 옮기는 요청](images/KO_6.4_prompt.png)
 
 ### 6.5 Pronunciation 탭: 단어 고치기
 
@@ -463,7 +559,7 @@ ursoTTS가 샘플을 자동으로 변환하므로(모노, 24 kHz, 최대 30초) 
 6. **가장 좋은 버전**을 고르고, 원하면 *Sounds like*에 설명을 씁니다.
 7. **Save to pronunciation rules**를 누릅니다(`pronunciations.yaml`에 저장됩니다). 그 단어를 쓰는 모든 대본은 다음 batch 때 다시 만들어집니다.
 
-매끄럽게 들리는 표기를 쓰는 법은 [8.3](#83-발음-고치기) 참고.
+자연스럽게 읽히도록 표기하는 방법은 [9.3절](#93-발음-고치기) 참고.
 
 ### 6.6 Batch 탭: 폴더 전체 생성
 
@@ -475,15 +571,99 @@ ursoTTS가 샘플을 자동으로 변환하므로(모노, 24 kHz, 최대 30초) 
 4. **Render all scripts:** batch를 시작합니다.
 5. **Progress:** 대본과 문장을 만드는 과정을 보여 주고, 끝나면 요약을 보여 줍니다.
 
-`ursotts batch`와 같은 파일을, 같은 건너뛰기 규칙으로 만듭니다 ([7.6](#76-폴더-생성-ursotts-batch) 참고).
+`ursotts batch`와 같은 파일을, 같은 건너뛰기 규칙으로 만듭니다 ([8.6](#86-폴더-생성-ursotts-batch) 참고).
 
 <sub>[↑ 목차로](#목차)</sub>
 
-## 7. 터미널에서 명령어 쓰기
+## 7. ursoTTS 데스크톱 앱 쓰기
 
-Claude 없이 `ursotts` 명령어를 직접 입력하는 방법입니다. 가장 직접적이고 빠른 반복 작업에 좋지만, 명령어를 정확히 입력해야 합니다. 명령이 실패하면 언제든 오류를 Claude Code에 붙여 넣어 도움을 받을 수 있습니다 ([4장](#4-vs-code와-데스크톱-앱에서-claude-code-쓰기) 참고).
+웹 UI와 같은 기능을 VS Code Dark 스타일의 일반 창에서 씁니다. Python 환경에서 실행하거나(`ursotts app`), Python 없이 설치할 수 있습니다 ([7.2](#72-python-없이-설치하기-dmg--exe) 참고).
 
-### 7.1 터미널 열고 준비하기
+### 7.1 데스크톱 앱 시작하기
+
+![VS Code Dark 스타일의 ursoTTS 데스크톱 앱](images/app-speak.png)
+
+브라우저 탭보다 일반 창이 편하다면 데스크톱 앱을 쓰세요. 같은 기능을 VS Code Dark 스타일로 제공합니다.
+
+Claude Code에서 **시작하기**:
+
+```
+`ursotts app`으로 데스크톱 앱을 시작해 줘.
+```
+
+![Claude 패널의 요청](images/KO_7.1_prompt.png)
+
+또는 터미널에서, 프로젝트 폴더 안에서 ([8장](#8-터미널에서-명령어-쓰기) 참고):
+
+```bash
+cd ~/Projects/ursotts
+source .venv/bin/activate
+ursotts app
+```
+
+![터미널: 폴더로 이동하고 환경을 켜기 전에는 ursotts app이 실패](images/7.1_prompt_terminal.png)
+
+이 스크린샷의 첫 줄은 가장 흔한 실수입니다. 프로젝트 폴더로 이동해 환경을 켜기 전에는 `ursotts app`이 *command not found*로 나옵니다.
+
+`.dmg`나 `.exe`로 설치했다면 ([7.2](#72-python-없이-설치하기-dmg--exe) 참고) 다른 앱처럼 **ursoTTS**를 열기만 하면 됩니다.
+
+| 부분 | 기능 |
+|---|---|
+| **액티비티 바** (맨 왼쪽) | 마이크는 Speak, 텍스트는 Pronunciation, 폴더는 Batch, 터미널은 Claude Code 화면을 엽니다. 아래쪽 톱니바퀴를 누르면 `config.yaml`을 엽니다. 현재 선택한 화면은 코랄색으로 표시됩니다 |
+| **사이드바** | 언어와 목소리를 선택하고 말투를 조정할 수 있습니다. **+ Add voice file…**로 목소리 파일을 추가하고, 생성된 파일 목록도 확인할 수 있습니다. 가장자리를 끌어 너비를 조절합니다 |
+| **편집기** | 대본을 편집합니다. 줄 번호가 표시되고 주석, `@lang`, `[pause]`가 색으로 구분됩니다. **Open…**, **Save as…**, **Generate narration** 버튼을 사용할 수 있습니다 |
+| **OUTPUT 패널** | 시간이 표시되는 실시간 기록을 보여 줍니다. **⌘J**를 눌러 패널을 표시하거나 숨깁니다 |
+| **상태 표시줄** | 버전, 엔진, 목소리 모델의 로드 상태를 보여 줍니다 |
+
+<p><img src="images/app-pronunciation.png" width="49%" alt="데스크톱 앱: Pronunciation 화면"> <img src="images/app-batch.png" width="49%" alt="데스크톱 앱: Batch 화면"></p>
+
+단축키: **⌘↵** 현재 화면 실행, **⌘1–4** 화면 전환, **⌘O** 대본 열기, **⌘S** 저장(**⇧⌘S** 다른 이름으로 저장), **⌘+** / **⌘−** 확대·축소(70~160%), **⌘0** 원래 크기(100%). Batch의 폴더 창에는 **New Folder** 버튼이 있습니다. 창 크기, 확대 수준, 패널, 마지막 화면, 대본, 폴더를 기억합니다.
+
+데스크톱 앱은 Tkinter를 쓰며, python.org의 Python에는 기본으로 들어 있습니다. Homebrew의 Python이라면 `brew install python-tk@3.13`(내 Python 버전에 맞게)으로 한 번 설치하세요. 웹 UI는 어느 쪽이든 그대로 작동합니다.
+
+**저장과 닫기.** 내레이션 파일은 만들어지는 즉시 `output/app/`에 저장되고, 편집기의 내용은 다음에 열 때 그대로 남아 있습니다. 열거나 저장한 파일의 대본이라면 탭의 **●** 표시가 저장하지 않은 변경 사항을 뜻하며, 닫기 전에 저장할지 묻습니다. 내레이션을 만드는 중에 끄려고 할 때도 먼저 확인합니다.
+
+**터미널을 열어 두지 않고 쓰기.** `ursotts app`은 실행한 터미널 창이 열려 있어야 합니다. 두 가지 방법이 있습니다:
+
+- `ursotts app --detach`는 앱을 백그라운드에서 시작합니다. 터미널은 바로 닫아도 됩니다.
+- `ursotts make-launcher`(또는 앱의 **File → Create launcher…**)는 더블클릭으로 여는 실행 아이콘을 만듭니다. Mac은 홈 폴더의 응용 프로그램(Applications)에 **ursoTTS**가 생기고(원하면 Dock으로 끌어다 놓기), Windows는 바탕 화면과 시작 메뉴에 바로 가기가, Linux는 앱 메뉴에 항목이 생깁니다. 프로젝트 폴더 안에서 한 번만 실행하세요.
+
+### 7.2 Python 없이 설치하기 (.dmg / .exe)
+
+![ursoTTS 시작 화면](images/app-splash.png)
+
+Python이나 터미널을 쓰고 싶지 않은 분을 위해 데스크톱 앱을 일반 설치 파일로도 제공합니다. [최신 릴리스](https://github.com/ursomics/ursotts/releases/latest)에서 받으세요. Apple Silicon Mac은 `ursoTTS-1.0.0-mac-arm64.dmg`(열고 ursoTTS를 응용 프로그램으로 끌어다 놓기), Windows는 `ursoTTS-1.0.0-windows-setup.exe`입니다. 파일 이름의 버전 번호는 릴리스마다 바뀝니다.
+
+- **처음 열 때:** 설치 파일은 아직 유료 인증서로 서명되지 않았습니다. Mac은 ursoTTS를 오른쪽 클릭 → **열기** → **열기**, Windows는 **추가 정보** → **실행**을 누르세요. 한 번만 하면 됩니다.
+- **내 파일:** 설치한 앱은 홈 폴더의 **`ursoTTS`** 폴더에서 작업합니다. 처음 실행할 때 기본 설정과 예제 대본과 함께 만들어집니다. 목소리는 **+ Add voice file…**로 추가하고, 결과는 `output/`에 저장됩니다.
+- **목소리 모델:** 첫 내레이션을 만들 때 한 번 내려받습니다(몇 GB, 인터넷 필요).
+- **Claude Code 화면:** 설치한 앱에서는 앱 코드가 설치 파일 안에 봉인되어 있어 Ask 모드만 됩니다. 앱을 바꾸려면 소스 버전을 쓰세요.
+- **MP3 내보내기**는 ffmpeg를 따로 설치하지 않아도 됩니다. 함께 들어 있습니다.
+
+<p><img src="images/app-installed.png" width="68%" alt="처음 실행한 설치 앱 (~/ursoTTS에서 작업)"> <img src="images/app-about.png" width="29%" alt="Help → About ursoTTS"></p>
+
+처음 실행하면 목소리 목록이 비어 있습니다. **+ Add voice file…**로 샘플을 추가하세요. **Help → About ursoTTS**에서 버전을 볼 수 있습니다.
+
+### 7.3 Claude Code로 앱 바꾸기
+
+![데스크톱 앱의 Claude Code 화면](images/app-claude.png)
+
+**Claude Code** 화면(터미널 아이콘)에서는 "사이드바를 340 px로 넓혀 줘", "Speed 슬라이더를 추가해 줘"처럼 말로 요청해 앱 자체를 바꿀 수 있습니다. VS Code에서 쓰는 것과 같은 Claude 로그인으로 Claude Code 명령줄(`claude`)을 실행합니다.
+
+1. 모드를 고릅니다: **Ask**(설명만, 아무것도 바꾸지 않음) 또는 **Edit the app**.
+2. 요청을 입력하거나 **Ideas**에서 하나를 고른 뒤 **Send to Claude**(**⌘↵**)를 누릅니다. Claude가 무엇을 읽고 고치는지 기록에 보입니다.
+3. **⟳ Restart app**을 누르면 바뀐 모습이 보입니다.
+4. 마음에 들지 않으면 **↶ Undo last change**를 누르세요. 앱은 고치기 전마다 자기 파일을 백업하고(최근 다섯 개를 `.cache/claude_undo/`에 보관), 다시 시작하면 되돌아갑니다.
+
+Edit 모드에서 Claude는 파일을 읽고 고치기만 할 수 있습니다. 터미널 명령이나 설치는 하지 않습니다. **Open in VS Code**는 프로젝트를 VS Code에서 열어 변경 내용을 확인하게 해 주고, **Copy request for VS Code**는 요청을 필요한 설명과 함께 복사해 VS Code의 Claude 패널에 붙여 넣을 수 있게 합니다. Claude 화면은 Claude Code 명령줄이 필요합니다([5.1](#51-설치하기) 참고). 없으면 복사 버튼을 쓰세요.
+
+<sub>[↑ 목차로](#목차)</sub>
+
+## 8. 터미널에서 명령어 쓰기
+
+Claude 없이 `ursotts` 명령어를 직접 입력하는 방법입니다. 가장 직접적이고 빠른 반복 작업에 좋지만, 명령어를 정확히 입력해야 합니다. 명령이 실패하면 언제든 오류를 Claude Code에 붙여 넣어 도움을 받을 수 있습니다 ([4장](#4-vs-code와-claude-desktop-앱에서-claude-code-쓰기) 참고).
+
+### 8.1 터미널 열고 준비하기
 
 **터미널**을 엽니다(Mac: **Cmd+Space**를 누르고 *터미널* 또는 *Terminal*을 입력한 뒤 **Enter**). VS Code의 통합 터미널(**Ctrl+~**)은 이미 프로젝트 폴더에서 열립니다.
 
@@ -498,18 +678,22 @@ source .venv/bin/activate         # 환경 켜기. 프롬프트에 (.venv)가 �
 
 새 터미널을 열 때마다 `cd`와 `source` 줄을 실행합니다. Windows에서는 `.venv\Scripts\activate`로 켭니다.
 
-### 7.2 명령어 한눈에 보기
+### 8.2 명령어 한눈에 보기
 
-| 명령어 | 하는 일 |
+| 명령어 | 기능 |
 |---|---|
-| `ursotts check` | 설정 확인: GPU, 목소리 모델, ffmpeg, 목소리 샘플 |
-| `ursotts preview 파일` | 소리를 만들지 않고 대본을 어떻게 읽을지 보여 줌 |
-| `ursotts say "텍스트" -o 파일` | 한 문장이나 짧은 텍스트 생성 |
-| `ursotts batch 입력폴더 출력폴더` | 폴더의 모든 대본 생성 |
-| `ursotts ui` | 웹 UI 시작 |
-| `ursotts --help`, `ursotts batch --help` | 모든 명령어, 또는 한 명령어의 옵션 보기 |
+| `ursotts check` | 설정을 확인합니다. GPU, 목소리 모델, ffmpeg, 목소리 샘플 상태를 점검합니다 |
+| `ursotts preview 파일` | 음성을 생성하지 않고 대본을 어떻게 읽을지 미리 확인합니다 |
+| `ursotts say "텍스트" -o 파일` | 한 문장이나 짧은 텍스트를 음성으로 생성합니다 |
+| `ursotts batch 입력폴더 출력폴더` | 입력 폴더의 모든 대본을 음성으로 생성합니다 |
+| `ursotts ui` | 웹 UI를 실행합니다 |
+| `ursotts app` | 데스크톱 앱을 엽니다([7장](#7-ursotts-데스크톱-앱-쓰기) 참고). `--detach`를 붙이면 터미널을 닫아도 됩니다 |
+| `ursotts make-launcher` | 데스크톱 앱을 더블클릭으로 여는 실행 아이콘을 만듭니다([7.1](#71-데스크톱-앱-시작하기) 참고) |
+| `ursotts --help`, `ursotts batch --help` | 전체 명령어 목록이나 특정 명령어의 옵션을 확인합니다 |
 
-### 7.3 설정 확인: `ursotts check`
+![ursotts --help는 모든 명령어를 보여 줍니다](images/terminal-help.png)
+
+### 8.3 설정 확인: `ursotts check`
 
 ```bash
 ursotts check
@@ -518,7 +702,7 @@ ursotts check
 설정이 잘 되어 있으면 이렇게 나옵니다:
 
 ```
-ursotts 0.6.7
+ursotts 1.0.0
 engine: chatterbox
 torch 2.6.0 | best device: mps
 chatterbox: installed
@@ -529,7 +713,11 @@ voice[ko]: /Users/you/Projects/ursotts/voices/my_voice_ko.wav OK
 
 *NOT installed*, *not found*, *MISSING*으로 표시된 항목이 고쳐야 할 부분입니다.
 
-### 7.4 대본 미리 보기: `ursotts preview`
+![모든 항목이 OK인 Mac의 ursotts check](images/8.3_terminal_check.png)
+
+*pkg_resources is deprecated* 같은 경고는 ursoTTS가 쓰는 라이브러리에서 나옵니다. 문제없으니 무시해도 됩니다.
+
+### 8.4 대본 미리 보기: `ursotts preview`
 
 ```bash
 ursotts preview scripts/02_intro_ko.txt
@@ -542,25 +730,27 @@ ursotts preview scripts/02_intro_ko.txt
    ... pause 0.7s
 ```
 
-생성하기 전에 발음 표기 ([8.3](#83-발음-고치기) 참고)와 언어 감지를 확인할 때 쓰세요.
+![ursotts preview는 덩어리마다 언어와 쉼을 보여 줍니다](images/terminal-preview-ko.png)
 
-### 7.5 한 문장 만들기: `ursotts say`
+생성하기 전에 발음 표기 ([9.3](#93-발음-고치기) 참고)와 언어 감지를 확인할 때 쓰세요.
+
+### 8.5 한 문장 만들기: `ursotts say`
 
 ```bash
 ursotts say "Welcome to Ursomics." -o output/hello.wav
 ursotts say "안녕하세요, Ursomics입니다." -o output/hello_ko.wav --lang ko
 ```
 
-| 옵션 | 뜻 |
+| 옵션 | 기능 |
 |---|---|
-| `-o 파일` | WAV를 저장할 곳(기본값: `say.wav`) |
-| `--lang en` / `--lang ko` | `@lang`처럼 전체를 한 언어, 한 목소리로 읽기 |
-| `--engine dummy` | 목소리 모델 없이 테스트(신호음 재생) |
-| `-c 파일` | 다른 설정 파일 쓰기(기본값: `config.yaml`) |
+| `-o 파일` | WAV 파일을 저장할 위치를 지정합니다. 기본값은 `say.wav`입니다 |
+| `--lang en` / `--lang ko` | 전체 텍스트를 지정한 언어와 목소리 하나로 읽습니다. `@lang`을 사용하는 것과 같습니다 |
+| `--engine dummy` | 목소리 모델 없이 테스트합니다. 재생하면 신호음이 납니다 |
+| `-c 파일` | 사용할 설정 파일을 지정합니다. 기본값은 `config.yaml`입니다 |
 
 텍스트는 따옴표로 감싸세요. 띄어쓰기나 한국어가 들어 있으면 특히 그렇습니다.
 
-### 7.6 폴더 생성: `ursotts batch`
+### 8.6 폴더 생성: `ursotts batch`
 
 ```bash
 ursotts batch scripts output
@@ -572,46 +762,62 @@ ursotts batch scripts output
 output/name.wav   output/name.mp3   output/name.srt   output/batch_report.json
 ```
 
-| 옵션 | 뜻 |
+| 옵션 | 기능 |
 |---|---|
-| `--force` | 바뀌지 않은 대본도 다시 만들기(보통은 건너뜀) |
-| `--engine dummy` | 목소리 모델 없이 전체 과정 테스트 |
-| `-c 파일` | 다른 설정 파일 쓰기 |
+| `--force` | 변경되지 않은 대본도 다시 생성합니다. 기본적으로는 건너뜁니다 |
+| `--engine dummy` | 목소리 모델 없이 전체 과정을 테스트합니다 |
+| `-c 파일` | 사용할 설정 파일을 지정합니다 |
 
 다시 실행하면 텍스트와 설정이 바뀌지 않은 대본은 건너뛰고, `--force`를 붙여도 바뀐 문장만 새로 만듭니다. `batch_report.json`에 대본마다 길이가 적혀 있어 영상 타이밍을 확인할 때 편합니다.
 
-### 7.7 웹 UI 시작: `ursotts ui`
+![실행 중인 ursotts batch: 모델을 불러온 뒤 문장마다 생성](images/8.6_terminal_batch.png)
+
+처음 실행할 때는 목소리 모델을 불러오면서 몇 가지 경고(예: Hugging Face 토큰, 반복 토큰)가 나옵니다. 문제없으며 내레이션은 정상적으로 만들어집니다.
+
+### 8.7 웹 UI 시작: `ursotts ui`
 
 ```bash
 ursotts ui
 ```
 
-| 옵션 | 뜻 |
+| 옵션 | 기능 |
 |---|---|
-| `--port 7861` | 7860이 쓰이고 있으면 다른 포트 사용 |
-| `--no-browser` | 브라우저 탭을 자동으로 열지 않음 |
-| `--engine dummy` | 목소리 모델 없이 페이지 테스트 |
-| `--share` | 임시 **공개** 링크를 만듦. 의도한 경우에만 |
+| `--port 7861` | 기본 포트 7860을 사용할 수 없을 때 다른 포트를 사용합니다 |
+| `--no-browser` | 브라우저 탭을 자동으로 열지 않습니다 |
+| `--engine dummy` | 목소리 모델 없이 페이지를 테스트합니다 |
+| `--share` | 임시 **공개 링크**를 만듭니다. 공개를 의도한 경우에만 사용하세요 |
 
 멈추려면 **Ctrl+C**를 누릅니다. 자세한 내용은 [6.1](#61-시작하고-끄기) 참고.
 
-### 7.8 알아 두면 편한 키와 요령
+### 8.8 알아 두면 편한 키와 요령
 
-| 키·요령 | 하는 일 |
+| 키·요령 | 기능 |
 |---|---|
-| **↑** / **↓** | 이전 명령어를 다시 불러와서 다시 입력할 필요가 없음 |
-| **Tab** | 파일·폴더 이름 자동 완성(`scripts/01` + Tab) |
-| **Ctrl+C** | 실행 중인 명령 멈추기 |
-| **Cmd+K** 또는 `clear` | 화면 지우기 |
-| 따옴표 `"…"` | 띄어쓰기나 한국어가 들어간 텍스트를 하나로 묶기 |
+| **↑** / **↓** | 이전 명령어를 다시 불러옵니다. 다시 입력할 필요가 없습니다 |
+| **Tab** | 파일·폴더 이름을 자동 완성합니다. 예: `scripts/01`을 입력한 뒤 **Tab** |
+| **Ctrl+C** | 실행 중인 명령을 중단합니다 |
+| **Cmd+K** 또는 `clear` | 화면을 지웁니다 |
+| 따옴표 `"…"` | 띄어쓰기나 한국어가 포함된 텍스트를 하나로 묶습니다 |
 
 > **ffmpeg는 대시 하나:** `ffmpeg --version`이 아니라 `ffmpeg -version`입니다. 다른 도구들(`python --version`, `git --version`)은 대부분 대시 두 개입니다.
 
+### 8.9 Windows와 서버
+
+- **Windows:** 웹 UI, 데스크톱 앱, 터미널 명령어 모두 작동합니다. NVIDIA GPU가 가장 빠릅니다. ffmpeg는 `winget install ffmpeg`로 설치하고, 환경은 `.venv\Scripts\activate`로 켭니다. 데스크톱 앱은 Windows 내장 플레이어로 WAV를 재생하므로 ■ Stop도 작동합니다. Windows 설치 파일도 있습니다 ([7.2](#72-python-없이-설치하기-dmg--exe) 참고).
+- **AWS EC2:** `ursotts batch`나 웹 UI를 쓰세요. 데스크톱 앱은 화면이 필요해서 EC2에서는 실행되지 않습니다. 웹 UI는 SSH 터널(`ssh -L 7860:localhost:7860 you@your-ec2-host`)로 연결한 뒤 내 컴퓨터에서 http://localhost:7860 을 엽니다. `--share`를 쓰거나 7860 포트를 인터넷에 열지 마세요.
+- **S3:** ursoTTS는 일반 폴더를 쓰므로 `aws s3 sync`로 파일을 내려받고 올립니다:
+
+```bash
+aws s3 sync s3://your-bucket/scripts scripts/
+ursotts batch scripts output
+aws s3 sync output/ s3://your-bucket/narration/
+```
+
 <sub>[↑ 목차로](#목차)</sub>
 
-## 8. 내레이션 만들기
+## 9. 내레이션 만들기
 
-### 8.1 목소리 샘플 녹음하기
+### 9.1 목소리 샘플 녹음하기
 
 - 영상과 같은 말투로 **10~30초** 동안 자연스럽게 말합니다.
 - 조용한 방, 음악 없이, 한 사람만, 마이크와 일정한 거리.
@@ -624,11 +830,13 @@ ursotts ui
 앞뒤 무음 제거. 최종 길이를 초 단위로 알려 줘.
 ```
 
-웹 UI에서 바로 녹음할 수도 있습니다(**Speak** 탭 → *Record or upload a sample*).
+![휴대폰 녹음 변환 요청](images/KO_9.1_prompt.png)
+
+웹 UI에서 바로 녹음하거나(**Speak** 탭 → *Record or upload a new sample*), 데스크톱 앱에서 추가할 수도 있습니다(**+ Add voice file…**).
 
 **다른 TTS 서비스로 만든 샘플도 테스트에는 쓸 수 있지만**, 클론을 다시 클로닝하면 자연스러움이 조금 떨어집니다. 직접 녹음한 목소리가 가장 좋습니다.
 
-### 8.2 대본 쓰기
+### 9.2 대본 쓰기
 
 ```text
 @lang ko
@@ -640,27 +848,27 @@ ursotts ui
 
 | 요소 | 효과 |
 |---|---|
-| `@lang en` / `@lang ko` | 파일 전체를 한 언어(와 한 목소리 샘플)로 고정 |
-| `@lang auto`(기본값) | 문장마다 영어인지 한국어인지 감지 |
-| 빈 줄 | 문단 사이 쉼(config의 `pauses.paragraph`) |
-| `[pause 1.5]` | 1.5초 쉼. `[pause]`만 쓰면 1초 |
-| `# ...` | 메모, 읽지 않음 |
+| `@lang en` / `@lang ko` | 파일 전체의 언어와 목소리 샘플을 지정한 언어로 고정합니다 |
+| `@lang auto`(기본값) | 문장마다 영어와 한국어를 자동으로 감지합니다 |
+| 빈 줄 | 문단 사이에 쉼을 넣습니다. 길이는 설정 파일의 `pauses.paragraph` 값으로 정합니다 |
+| `[pause 1.5]` | 1.5초 동안 쉽니다. `[pause]`만 쓰면 1초 쉽니다 |
+| `# ...` | 메모로 처리하며, 소리 내어 읽지 않습니다 |
 
 **언어를 고정해야 할 때:** 한국어 대본에 영어 문장이 통째로 들어 있으면(예: 논문 제목) `auto`는 그 문장에서 영어 목소리 샘플로 바꿉니다. 한국어 억양으로 영어를 읽는 한 가지 목소리를 원하면 맨 위에 `@lang ko`를 쓰세요. 자세한 내용은 [한영 혼합 대본의 발음](#한영-혼합-대본의-발음)을 보세요.
 
-### 8.3 발음 고치기
+### 9.3 발음 고치기
 
 유전자 이름과 약어는 그대로 두면 제대로 읽히는 경우가 드뭅니다. ursoTTS는 흔한 경우를 자동으로 처리하고, 나머지는 `pronunciations.yaml`에 한 번만 정해 두면 됩니다. 그러면 모든 영상에 적용됩니다. 자막은 항상 원래 표기를 유지합니다.
 
 #### 자동: 약어
 
-2~6글자 대문자 단어는 한 단어처럼 매끄럽게 철자를 풀어 읽습니다:
+2~6글자 대문자 단어는 글자마다 자연스럽게 이어 읽습니다:
 
 | 대본 | 영어 목소리 | 한국어 목소리 |
 |---|---|---|
 | DNA | D.N.A. | 디엔에이 |
 | HLA, MHC | H.L.A., M.H.C. | 에이치엘에이, 엠에이치씨 |
-| DNA를 | — | 디엔에이를(한국어 조사도 됩니다) |
+| DNA를 | — | 디엔에이를(한국어 조사를 적절하게 붙일 수 있습니다) |
 
 `config.yaml`에서 `spell_acronyms: false`로 끌 수 있습니다. 사전 항목이 항상 우선하므로, 단어처럼 읽는 대문자 단어(UMAP, FACS, NANOG)는 항목만 추가하면 됩니다.
 
@@ -668,12 +876,12 @@ ursotts ui
 
 영어 문장의 용어는 `en:`, 한국어 문장의 용어는 `ko:` 아래에 적습니다. 영어 발음은 아래의 글자·음절 방식으로, 한국어 발음은 한글로 적습니다.
 
-| 용어 종류 | 이렇게 적기 | 예 |
+| 용어 종류 | 표기 방법 | 예 |
 |---|---|---|
-| 글자 | 대문자 하나마다 **점** | `CD8: C.D. eight`, `TCRs: T.C.R.s`, `RNA-seq: R.N.A. seek` |
-| 단어 같은 소리 | 두 글자 이상의 음절을 **점**으로 연결, 대문자는 강세 표시 | `NANOG: NAN.og`(목소리는 "nanog"로 읽음) |
-| 쓴 그대로 | 특별한 것 없음 | `Ursomics: Ursomics` |
-| 한국어 | **한글**로 읽는 법 | `GATA6: 가타식스`, `KIR: 컬` |
+| 글자 이름으로 읽는 약어 | 대문자 하나마다 **점**을 찍습니다 | `CD8: C.D. eight`, `TCRs: T.C.R.s`, `RNA-seq: R.N.A. seek` |
+| 단어처럼 읽는 약어 | 둘 이상의 음절을 점으로 나눕니다. 대문자는 강세를 표시합니다 | `NANOG: NAN.og`(목소리는 "nanog"으로 읽습니다) |
+| 그대로 읽을 이름 | 별도 표기 없이 원래 철자대로 씁니다 | `Ursomics: Ursomics` |
+| 한국어식으로 읽을 용어 | 발음대로 한글로 씁니다 | `GATA6: 가타식스`, `KIR: 컬` |
 
 **띄어쓰기나 하이픈 대신 점을 쓰세요.** `R N A`, `R-N-A`, `Ur-SOH-mics`처럼 쓰면 끊어지는 곳마다 쉬어서 뚝뚝 끊깁니다. `R.N.A.`는 자연스럽게 이어지는 글자로, `ur.SOH.miks`는 한 단어로 매끄럽게 읽힙니다.
 
@@ -783,14 +991,16 @@ pronunciations.yaml에 추가해 줘 (한국어):
 CD45: 씨디포티파이브
 ```
 
-### 8.4 말투 조정하기
+![발음 추가 요청](images/KO_9.3.2_prompt.png)
+
+### 9.4 말투 조정하기
 
 | config.yaml | 웹 UI | 효과 |
 |---|---|---|
-| `exaggeration` | Expressiveness | 0.3 차분함 … 0.5 기본 … 0.7 이상 생동감 |
-| `cfg_weight` | Pacing | 낮을수록 느리고 또박또박 |
-| `temperature` | Variation | 높을수록 다양함 |
-| `seed` | Seed | 바꾸면 같은 텍스트의 다른 버전 |
+| `exaggeration` | Expressiveness | 0.3이면 차분하게, 0.5가 기본값이며, 0.7 이상이면 생동감 있게 말합니다 |
+| `cfg_weight` | Pacing | 값을 낮추면 더 느리고 또박또박 말합니다 |
+| `temperature` | Variation | 값을 높이면 말투가 더 다양해집니다 |
+| `seed` | Seed | 값을 바꾸면 같은 텍스트도 다른 버전으로 생성됩니다 |
 
 Claude Code에게 문제를 말로 설명하면 잘 됩니다:
 ```
@@ -798,24 +1008,27 @@ Claude Code에게 문제를 말로 설명하면 잘 됩니다:
 더 생동감 있게 만든 다음, output/test1.wav를 다시 만들어 줘.
 ```
 
+![말투 조정 요청](images/KO_9.4_prompt.png)
+
 <sub>[↑ 목차로](#목차)</sub>
 
-## 9. 문제 해결
+## 10. 문제 해결
 
-| 보이는 증상 | 원인과 해결 |
+| 증상 | 원인과 해결 방법 |
 |---|---|
-| `Voice sample(s) missing` | 프로젝트 폴더 안이 아니거나(`pwd`로 확인), `voices/`의 파일 이름이 `config.yaml`과 다릅니다. |
-| 내레이션이 다른 사람 목소리 같음 | 목소리 샘플이 너무 짧거나 잡음이 많거나, `@lang auto`가 다른 언어 샘플로 바꿨습니다. 10~30초의 깨끗한 음성을 쓰고 `ursotts preview`로 확인하세요. |
-| `command not found: ursotts` | 환경이 켜지지 않았습니다. `source .venv/bin/activate`를 실행하세요. |
-| 폴더를 옮기거나 이름을 바꾼 뒤 이상한 오류 | `.venv`가 망가졌습니다. 지우고 설치 3단계를 다시 하세요 ([4.7](#47-claude-code로-ursotts-설치하기) 참고). |
-| `Unrecognized option '-version'` | `ffmpeg --version`을 입력했습니다. `ffmpeg -version`을 쓰세요. |
-| 첫 실행이 매우 느림 | 모델(몇 GB)을 내려받는 중입니다. 다음부터는 빠릅니다. |
-| 설정을 바꿨는데 다시 만들어지지 않음 | 실행하는 폴더의 `config.yaml`을 고쳤는지 확인하세요. |
-| Chatterbox를 불러올 때 `No module named pkg_resources` | `pip install -e ".[all]"`로 다시 설치하세요. Chatterbox의 워터마크 모듈에 필요한 `setuptools<81`을 고정합니다. |
-| 아주 새로운 Python에서 설치 실패 | 일부 패키지가 새 Python을 늦게 지원합니다. Python 3.11~3.13을 써 보세요. |
-| Claude Code 패널에 Spark 아이콘이 없음 | 먼저 파일을 열거나, 상태 표시줄의 **✻ Claude Code** 버튼을 쓰세요. |
-| 약어나 이름이 뚝뚝 끊김("R … N … A", "Ur … So … mics") | `pronunciations.yaml`의 표기가 글자 사이를 띄우거나 하이픈으로 나눴습니다. 글자는 점으로(`R.N.A.`), 단어 같은 소리는 점으로 이은 음절(`ur.SOH.miks`)로 쓰세요. [8.3](#83-발음-고치기) 참고. |
-| 그 밖의 문제 | Claude Code에서: "실패했어. @terminal:zsh를 보고 원인을 찾아서 고쳐 줘." |
+| `Voice sample(s) missing` | 프로젝트 폴더 밖에서 실행했거나(`pwd`로 확인), `voices/` 폴더의 파일 이름이 `config.yaml`의 이름과 다릅니다 |
+| 내레이션 목소리가 샘플과 다르게 들림 | 목소리 샘플이 너무 짧거나 잡음이 많을 수 있습니다. 또는 `@lang auto`가 다른 언어의 샘플을 선택했을 수 있습니다. 잡음이 적은 10~30초 분량의 음성을 사용하고 `ursotts preview`로 확인하세요 |
+| `command not found: ursotts` | 가상 환경이 활성화되지 않았습니다. `source .venv/bin/activate`를 실행하세요 |
+| 폴더를 옮기거나 이름을 바꾼 뒤 오류가 발생함 | `.venv`가 손상됐을 수 있습니다. 삭제한 뒤 설치 3단계를 다시 진행하세요([4.7절](#47-claude-code로-ursotts-설치하기-vs-code와-데스크톱-앱) 참고) |
+| `Unrecognized option '-version'` | `ffmpeg --version`이 아니라 `ffmpeg -version`을 입력하세요 |
+| 첫 실행이 매우 느림 | 용량이 큰 모델을 내려받고 있기 때문입니다. 다운로드가 끝나면 다음 실행부터는 빨라집니다 |
+| 문장마다 몇 초씩 걸리고 기록에 "…/1000"이 보임 | 정상입니다. 목소리 모델은 음성을 작은 조각(오디오 1초당 약 25개)으로 만들기 때문에, Apple Silicon Mac에서 5초 문장은 10초 정도 걸리고 CPU만 쓰면 더 걸립니다. 1000은 최댓값일 뿐이며, 문장이 끝나면 바로 멈춥니다 |
+| 설정을 바꿨는데 다시 생성되지 않음 | 현재 실행 중인 폴더의 `config.yaml`을 수정했는지 확인하세요 |
+| Chatterbox를 불러올 때 `No module named pkg_resources` 오류 | `pip install -e ".[all]"`로 다시 설치하세요. Chatterbox의 워터마크 모듈에 필요한 `setuptools<81`이 설치됩니다 |
+| 최신 Python에서 설치 실패 | 일부 패키지는 최신 Python을 아직 지원하지 않을 수 있습니다. Python 3.11~3.13을 사용해 보세요 |
+| Claude Code 패널에 Spark 아이콘이 없음 | 먼저 파일을 열어 보거나 상태 표시줄의 **✻ Claude Code** 버튼을 사용하세요 |
+| 약어나 이름이 끊겨 들림(“R … N … A”, “Ur … So … mics”) | `pronunciations.yaml`에서 글자 사이를 띄우거나 하이픈으로 나누지 않았는지 확인하세요. 글자 이름은 점으로(`R.N.A.`), 단어처럼 읽을 음절은 점으로 연결해(`ur.SOH.miks`) 표기하세요. [9.3절](#93-발음-고치기)을 참고하세요. |
+| 그 밖의 문제 | Claude Code에서 “실패했어. `@terminal:zsh`를 보고 원인을 찾아서 고쳐 줘.”라고 요청하세요. |
 
 ---
 

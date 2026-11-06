@@ -95,7 +95,8 @@ def cmd_check(args):
         print("chatterbox: installed")
     except ImportError:
         print("chatterbox: NOT installed  ->  pip install -e \".[all]\"")
-    print(f"ffmpeg: {shutil.which('ffmpeg') or 'not found (MP3 export disabled)'}")
+    from .audio import find_ffmpeg
+    print(f"ffmpeg: {find_ffmpeg() or 'not found (MP3 export disabled)'}")
     for lang, ref in cfg["voices"].items():
         print(f"voice[{lang}]: {ref} {'OK' if ref and Path(ref).exists() else 'MISSING'}")
 
@@ -109,6 +110,53 @@ def cmd_ui(args):
     if args.engine:
         cfg["engine"] = args.engine
     launch(cfg, port=args.port, share=args.share, open_browser=not args.no_browser)
+
+
+def cmd_app(args):
+    try:
+        import tkinter  # noqa: F401
+    except ImportError:
+        sys.exit("The desktop app needs Tkinter. On a Mac, use Python from python.org, or run:\n"
+                 "  brew install python-tk@3.13   (match your Python version)\nThe web UI works without it:  ursotts ui")
+    restart = ["-c", args.config] + (["--engine", args.engine] if args.engine else [])
+    if args.detach:
+        # start a separate app process that doesn't depend on this terminal
+        import subprocess
+        from pathlib import Path
+        log = Path.home() / ".config" / "ursotts" / "app.log"
+        log.parent.mkdir(parents=True, exist_ok=True)
+        python = sys.executable
+        kw = {}
+        if sys.platform.startswith("win"):
+            pythonw = Path(python).with_name("pythonw.exe")
+            python = str(pythonw) if pythonw.exists() else python
+            kw["creationflags"] = 0x00000008 | 0x00000200          # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
+        else:
+            kw["start_new_session"] = True                           # survives closing the terminal
+        with open(log, "w", encoding="utf-8") as fh:
+            proc = subprocess.Popen([python, "-m", "ursotts", "app", *restart], stdin=subprocess.DEVNULL,
+                                    stdout=fh, stderr=subprocess.STDOUT, **kw)
+        print(f"ursoTTS desktop app started (process {proc.pid}). You can close this terminal.")
+        print(f"Its log is in {log}")
+        return
+    from .app import launch
+    cfg = load_config(args.config)
+    if args.engine:
+        cfg["engine"] = args.engine
+    launch(cfg, restart_args=restart)
+
+
+def cmd_make_launcher(args):
+    from .launcher import make_launcher
+    made = make_launcher()
+    for path in made:
+        print(f"Created {path}")
+    if sys.platform == "darwin":
+        print("Open it from Applications (your home folder's Applications), or drag it to the Dock.")
+    elif sys.platform.startswith("win"):
+        print("Double-click ursoTTS on the Desktop, or find it in the Start menu.")
+    else:
+        print("ursoTTS now appears in your applications menu.")
 
 
 def main(argv=None):
@@ -148,6 +196,15 @@ def main(argv=None):
     u.add_argument("--share", action="store_true", help="temporary public link (careful!)")
     u.add_argument("--no-browser", action="store_true", help="don't open a browser tab")
     u.set_defaults(func=cmd_ui)
+
+    a = sub.add_parser("app", help="open the desktop app (VS Code-style window)")
+    a.add_argument("-c", "--config", default="config.yaml")
+    a.add_argument("--engine", choices=["chatterbox", "dummy"], help="override the engine in config.yaml")
+    a.add_argument("--detach", action="store_true", help="start in the background, so you can close the terminal")
+    a.set_defaults(func=cmd_app)
+
+    m = sub.add_parser("make-launcher", help="create a double-click launcher for the desktop app")
+    m.set_defaults(func=cmd_make_launcher)
 
     args = ap.parse_args(argv)
     if hasattr(args, "config") and not Path(args.config).exists():

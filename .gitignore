@@ -9,3 +9,8 @@ __pycache__/
 # except the placeholder that keeps the empty folder in the repo.
 voices/*
 !voices/.gitkeep
+build/
+dist/
+*.spec.bak
+.Rhistory
+.RData

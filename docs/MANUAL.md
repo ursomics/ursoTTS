@@ -6,7 +6,7 @@
   <img src="brand/ursotts_logo_360.png" width="180" alt="ursoTTS logo">
 </p>
 
-<h1 align="center">ursoTTS manual</h1>
+<h1 align="center">ursoTTS™ manual</h1>
 
 <p align="center">
   <b>From an empty folder to finished narration, step by step.</b><br>
@@ -16,6 +16,23 @@
 ---
 
 This manual takes you from an empty folder to finished narration for real videos. It assumes no programming experience: wherever a step needs code, it shows how to let **Claude Code** do it for you.
+
+> **📖 Reading this manual**
+>
+> - **Easiest:** read it [on GitHub](https://github.com/ursomics/ursotts/blob/main/docs/MANUAL.md), where everything displays exactly as intended.
+> - **On your computer:** open it in **VS Code** and press **Cmd+Shift+V** (Windows: **Ctrl+Shift+V**) for the preview, or **Cmd+K** then **V** to see it side by side. Open it from inside your `ursotts` folder so the screenshots show.
+> - **Other apps:** Typora (reading and editing in one view), Obsidian (free), or QLMarkdown (free; select the file in Finder and press **Space**).
+> - A few details, like the light/dark banner and some centering, only look exactly right on GitHub.
+
+## Two kinds of boxes
+
+| Box | What it is | Where to type it |
+|---|---|---|
+| Marked `bash` | A terminal command | The normal Terminal prompt (`%`) or VS Code's terminal (**Ctrl+~**), inside the `ursotts` folder. Not inside a Claude session. |
+| No label | A prompt for Claude, or example output to look at | The Claude Code chat: the VS Code panel, the Claude Desktop app, or the Claude Code CLI |
+
+- The `bash` label only colors the text. On a Mac, Terminal uses **zsh**, and the commands work exactly the same.
+- The **Claude Code CLI** also runs in a terminal window, but it's a chat with Claude, started by typing `claude`. A command typed there goes to Claude as a message; type `/exit` first to get back to the normal prompt.
 
 ## What you can use it for
 
@@ -37,12 +54,13 @@ Only clone your own voice, or a voice you have permission to use.
 1. [What you need](#1-what-you-need)
 2. [Get the project onto your computer](#2-get-the-project-onto-your-computer)
 3. [Ways to use ursoTTS](#3-ways-to-use-ursotts)
-4. [Using Claude Code in VS Code and the desktop app](#4-using-claude-code-in-vs-code-and-the-desktop-app)
+4. [Using Claude Code in VS Code and the Claude Desktop app](#4-using-claude-code-in-vs-code-and-the-claude-desktop-app)
 5. [Using the Claude Code CLI](#5-using-the-claude-code-cli)
 6. [Using the web UI](#6-using-the-web-ui)
-7. [Using the command line in the terminal](#7-using-the-command-line-in-the-terminal)
-8. [Making narration](#8-making-narration)
-9. [Troubleshooting](#9-troubleshooting)
+7. [Using the ursoTTS desktop app](#7-using-the-ursotts-desktop-app)
+8. [Using the command line in the terminal](#8-using-the-command-line-in-the-terminal)
+9. [Making narration](#9-making-narration)
+10. [Troubleshooting](#10-troubleshooting)
 
 ---
 
@@ -54,7 +72,7 @@ Only clone your own voice, or a voice you have permission to use.
 | Python 3.10 or newer | Tested on Python 3.13. Claude Code can install it for you. |
 | ffmpeg | Needed for MP3 export. On a Mac, install it with `brew install ffmpeg`. Without ffmpeg you still get WAV and subtitles. |
 | A Claude paid plan | Claude Code needs Pro, Max, Ultra, Team or Enterprise (not available on the Free plan). |
-| Your voice samples | 10–30 seconds of clear speech per language is needed (see [8.1](#81-record-your-voice-samples)). |
+| Your voice samples | 10–30 seconds of clear speech per language is needed (see [9.1](#91-record-your-voice-samples)). |
 
 <sub>[↑ Back to contents](#contents)</sub>
 
@@ -68,33 +86,34 @@ Only clone your own voice, or a voice you have permission to use.
 
 > **Mac tip:** your Documents and Desktop folders are synced if *iCloud → Drive → Desktop & Documents Folders* is turned on in System Settings. If it is, use a folder like `~/Projects` instead. Don't switch the setting off just for this: macOS would leave your existing files in iCloud Drive and give you an empty local folder.
 
-> **Don't rename or move the folder after setup.** A virtual environment stores its own full path and breaks when moved. If you do move it, delete `.venv` and create it again (see [4.7](#47-install-ursotts-with-claude-code), step 3).
+> **Don't rename or move the folder after setup.** A virtual environment stores its own full path and breaks when moved. If you do move it, delete `.venv` and create it again (see [4.7](#47-install-ursotts-with-claude-code-vs-code-and-desktop-app), step 3).
 
 <sub>[↑ Back to contents](#contents)</sub>
 
 ## 3. Ways to use ursoTTS
 
-ursoTTS can be used in three ways. All three share the same settings, voice samples and pronunciation rules, so you can mix them freely.
+ursoTTS can be used in four ways. All four share the same settings, voice samples and pronunciation rules, so you can mix them freely.
 
 | Way | What you do | Best for | Chapter |
 |---|---|---|---|
-| **Claude Code** | Ask Claude in plain words; it runs ursoTTS for you and fixes problems | Setup, changes, fixing pronunciation, anything you'd rather not type | [4](#4-using-claude-code-in-vs-code-and-the-desktop-app), [5](#5-using-the-claude-code-cli) |
+| **Claude Code** | Ask Claude in plain words; it runs ursoTTS for you and fixes problems | Setup, changes, fixing pronunciation, anything you'd rather not type | [4](#4-using-claude-code-in-vs-code-and-the-claude-desktop-app), [5](#5-using-the-claude-code-cli) |
 | **Web UI** | Click buttons in your browser | Trying sentences, recording voices, comparing pronunciations | [6](#6-using-the-web-ui) |
-| **Terminal** | Type `ursotts` commands yourself | Quick repeated runs, remote computers | [7](#7-using-the-command-line-in-the-terminal) |
+| **ursoTTS desktop app** | The same features in a normal window; also available as an installer without Python | Everyday narration, people who'd rather not use a browser or Python | [7](#7-using-the-ursotts-desktop-app) |
+| **Terminal** | Type `ursotts` commands yourself | Quick repeated runs, remote computers | [8](#8-using-the-command-line-in-the-terminal) |
 
 **Claude Code runs in three places.** It's the same Claude Code everywhere, sharing settings, skills and `CLAUDE.md`, so you can switch at any time:
 
 | Where | How it looks | Chapter |
 |---|---|---|
-| **VS Code extension** (recommended) | A chat panel beside your files and changes | [4](#4-using-claude-code-in-vs-code-and-the-desktop-app) |
-| **Claude Desktop app** (Code tab) | An all-in-one app with a chat box | [4](#4-using-claude-code-in-vs-code-and-the-desktop-app) |
+| **VS Code extension** (recommended) | A chat panel beside your files and changes | [4](#4-using-claude-code-in-vs-code-and-the-claude-desktop-app) |
+| **Claude Desktop app** (Code tab) | An all-in-one app with a chat box | [4](#4-using-claude-code-in-vs-code-and-the-claude-desktop-app) |
 | **Claude Code CLI** | The same chat, inside a terminal window | [5](#5-using-the-claude-code-cli) |
 
-> The Claude Code CLI is still a conversation with Claude in plain words; it only looks like a terminal. Typing `ursotts` commands yourself, without Claude, is [chapter 7](#7-using-the-command-line-in-the-terminal).
+> The Claude Code CLI is still a conversation with Claude in plain words; it only looks like a terminal. Typing `ursotts` commands yourself, without Claude, is [chapter 8](#8-using-the-command-line-in-the-terminal).
 
 <sub>[↑ Back to contents](#contents)</sub>
 
-## 4. Using Claude Code in VS Code and the desktop app
+## 4. Using Claude Code in VS Code and the Claude Desktop app
 
 VS Code and the desktop app both show Claude in a chat box where you type requests in plain words. Set up the one you prefer (see [4.1](#41-set-up-claude-code-in-vs-code-recommended) or [4.2](#42-set-up-the-claude-desktop-app-code-tab)); everything from [4.3](#43-choose-a-permission-mode) on works the same in both, and in the CLI (see [chapter 5](#5-using-the-claude-code-cli)).
 
@@ -264,7 +283,7 @@ Type `/` in the prompt box to see every command. They work the same in VS Code, 
 - **Session history:** the clock button at the top of the panel lists past conversations.
 - **Separate tabs:** use *Open in New Tab* from the Command Palette (**Cmd+Shift+P**) for a separate task, so the conversations don't mix.
 
-### 4.7 Install ursoTTS with Claude Code
+### 4.7 Install ursoTTS with Claude Code (VS Code and desktop app)
 
 Open the `ursotts` folder in your Claude Code surface of choice and paste these prompts in order. Switch to **Manual** mode first so you approve each command.
 
@@ -274,11 +293,15 @@ Add to @CLAUDE.md: I use a Mac with Apple Silicon. Explain things simply,
 I'm not a programmer.
 ```
 
+![Step 1 in the Claude panel: Claude adds your rules to CLAUDE.md](images/4.7_step1-prompt_EN.png)
+
 **Step 2: understand the project** (Plan mode)
 ```
 Read @README.md, @config.yaml and @ursotts/ and explain in simple terms how a
 script in scripts/ becomes an MP3. Don't change anything.
 ```
+
+![Step 2: the request in the Claude panel](images/4.7_step2-prompt_EN.png)
 
 **Step 3: install**
 ```
@@ -287,18 +310,38 @@ tell me how to install it), create a virtual environment in .venv, install
 the project with the "all" extra, then run `ursotts check` and fix anything
 it reports as missing except my voice samples.
 ```
+
+![Step 3: the install request in the Claude panel](images/4.7_step3.1-prompt_EN.png)
+
 The install downloads PyTorch, which is large, so it takes a while.
 
-**Step 4: add your voices.** Put your samples into `voices/` (see [8.1](#81-record-your-voice-samples)), then:
+When it's done, Claude sums up what's left for you, including the two lines to run in each new terminal window:
+
+![Claude's summary after the install: what's left for you](images/4.7_step3.2_panel_EN.png)
+
+![The same summary with VS Code's terminal below, where the two lines were run](images/4.7_step3.3_panel_EN.png)
+
+**Step 4: add your voices.** Put your samples into `voices/` (see [9.1](#91-record-your-voice-samples)), then:
 ```
 Run `ursotts check` again and confirm both voices show OK.
 ```
+
+Claude explains how to record and name the files; your `voices` folder should then hold both samples, and the check confirms them:
+
+![Claude's instructions for recording the voice samples](images/4.7_step4.1_prompt_EN.png)
+
+![The voices folder with my_voice_en.wav and my_voice_ko.wav](images/4.7_step4.2_voice_EN.png)
+
+![The check: both voices OK, with their lengths](images/4.7_step4.3_ok_EN.png)
 
 **Step 5: first test**
 ```
 Run: ursotts say "Welcome. Today we analyze scRNA-seq data." -o output/test1.wav
 If it fails, read the error, fix it, and run it again.
 ```
+
+![Step 5: the first test request](images/4.7_step5_prompt_EN.png)
+
 The first real run downloads the Chatterbox model (a few GB). After that it starts in seconds.
 
 **Step 6: open the web UI**
@@ -312,7 +355,7 @@ How to use each tab is explained in [chapter 6](#6-using-the-web-ui).
 The last command failed. Look at @terminal:zsh, find the cause, and fix it.
 ```
 
-**If a word sounds wrong**, ask Claude Code to fix it directly (see [8.3](#83-fix-pronunciation)):
+**If a word sounds wrong**, ask Claude Code to fix it directly (see [9.3](#93-fix-pronunciation)):
 
 ```
 In the test, "TCRs" sounds like "tickers". Add an entry to pronunciations.yaml
@@ -327,11 +370,36 @@ Tips for asking:
 - **Ask for the same sentence again** after the fix, so you can compare before and after.
 - Several words? **List them all in one request.**
 
+### 4.8 Update to a new version
+
+You don't need to start over. Your `.venv`, the downloaded voice model and your voice samples stay as they are; only the project files are replaced.
+
+**If you downloaded a zip**, paste this into Claude Code with the `ursotts` folder open:
+
+```
+I downloaded a new ursotts.zip to ~/Downloads. Unzip it to a temporary folder and
+copy its files into this project, but keep my voices/ folder as it is, and merge
+pronunciations.yaml and config.yaml (keep my own entries and settings). Then run
+pip install -e ".[all]" in .venv and `ursotts check`.
+```
+
+![After the update prompt: Claude's summary, with every check passing](images/4.8_update01-prompt.png)
+
+**If you cloned the project from GitHub:**
+
+```
+Update this project from GitHub with git pull. Keep my voices/ folder and my own
+entries in pronunciations.yaml and config.yaml. Then run pip install -e ".[all]"
+in .venv and `ursotts check`.
+```
+
+Reinstalling only takes a moment and picks up any new packages a version needs. Then check them in order: `ursotts check` → `ursotts ui` → `ursotts app`. If the desktop app reports that Tkinter is missing, see [chapter 7](#7-using-the-ursotts-desktop-app).
+
 <sub>[↑ Back to contents](#contents)</sub>
 
 ## 5. Using the Claude Code CLI
 
-The Claude Code CLI is the same Claude Code as in [chapter 4](#4-using-claude-code-in-vs-code-and-the-desktop-app), inside a terminal window. You still type requests in plain words, and the modes (see [4.3](#43-choose-a-permission-mode)), slash commands (see [4.5](#45-slash-commands)) and `CLAUDE.md` work the same. Only the look is different: text only, no buttons or side-by-side diffs.
+The Claude Code CLI is the same Claude Code as in [chapter 4](#4-using-claude-code-in-vs-code-and-the-claude-desktop-app), inside a terminal window. You still type requests in plain words, and the modes (see [4.3](#43-choose-a-permission-mode)), slash commands (see [4.5](#45-slash-commands)) and `CLAUDE.md` work the same. Only the look is different: text only, no buttons or side-by-side diffs.
 
 **When it's useful:** working on a remote computer over SSH (a cloud GPU or a lab server), when you prefer the keyboard, or when you're already in a terminal.
 
@@ -343,12 +411,16 @@ Follow the official setup guide: <https://code.claude.com/docs/en/setup>. Then c
 claude --version
 ```
 
+![Terminal: claude --version shows the installed version](images/5.1_terminal.png)
+
 ### 5.2 Start a session
 
 ```bash
 cd ~/Projects/ursotts      # always start inside the project folder
 claude
 ```
+
+![A Claude Code CLI session started in the terminal](images/5.2_start_session.png)
 
 The first time, Claude asks you to sign in and opens your browser to finish. You can also run `claude` in VS Code's integrated terminal (**Ctrl+~**).
 
@@ -389,11 +461,13 @@ The web UI is a second way to use ursoTTS: the same features as the terminal com
 ```
 Start the web UI with `ursotts ui`.
 ```
-Or from a terminal, inside the project folder (see [chapter 7](#7-using-the-command-line-in-the-terminal)):
+Or from a terminal, inside the project folder (see [chapter 8](#8-using-the-command-line-in-the-terminal)):
 ```bash
 source .venv/bin/activate
 ursotts ui
 ```
+
+![The terminal after running ursotts ui](images/terminal-ui-start.png)
 
 Your browser opens **http://127.0.0.1:7860**. The page runs only on your computer; nothing is uploaded. It follows your system's light or dark mode.
 
@@ -413,7 +487,7 @@ Your browser opens **http://127.0.0.1:7860**. The page runs only on your compute
 
 ![The Speak tab: (1) script, (2) language, (3) voice, (4) saved voices, (5) generate, (6) narration player, (7) files, (8) speaking style](images/webui-01-speak.png)
 
-1. **Script:** paste your narration. Blank lines become paragraph pauses, `[pause 1.5]` adds a pause, and lines starting with `#` are skipped, exactly as in a script file (see [8.2](#82-write-scripts)).
+1. **Script:** paste your narration. Blank lines become paragraph pauses, `[pause 1.5]` adds a pause, and lines starting with `#` are skipped, exactly as in a script file (see [9.2](#92-write-scripts)).
 2. **Language:** *Auto* detects English or Korean sentence by sentence. Choose *English* or *Korean* to read everything in one language and one voice, like `@lang en` / `@lang ko`.
 3. **Voice:** *My saved voices* uses the samples in your `voices` folder; *Record or upload a new sample* lets you use a new one (see [6.3](#63-try-a-different-voice)).
 4. **English voice / Korean voice:** pick a sample file for each language from the `voices` folder. Click **Refresh** after adding new files to the folder.
@@ -436,6 +510,8 @@ ursoTTS converts the sample automatically (mono, 24 kHz, at most 30 seconds), so
 **To keep the voice**, type a name under **Keep this voice as** (for example `my_voice_ko`) and click **Save to my voices**. It's saved in your `voices` folder and appears in the English and Korean voice lists under *My saved voices*.
 
 ### 6.4 Speaking style
+
+![The Speaking style panel opened under the download list](images/webui-05-speaking-style.png)
 
 Click **Speaking style** under the download list (8 in the Speak tab picture) to open the sliders:
 
@@ -463,7 +539,7 @@ Set exaggeration 0.4, cfg_weight 0.45 and seed 7 in @config.yaml.
 6. Choose the **best version**, and optionally describe it under *Sounds like*.
 7. Click **Save to pronunciation rules** (it saves to `pronunciations.yaml`). Every script that uses the word is re-rendered on the next batch.
 
-How to write spellings that sound smooth is explained in [8.3](#83-fix-pronunciation).
+How to write spellings that sound smooth is explained in [9.3](#93-fix-pronunciation).
 
 ### 6.6 Batch tab: render a whole folder
 
@@ -475,15 +551,99 @@ How to write spellings that sound smooth is explained in [8.3](#83-fix-pronuncia
 4. **Render all scripts:** starts the batch.
 5. **Progress:** shows each script and sentence as it's made, then a summary.
 
-This does exactly what `ursotts batch` does, with the same files and the same skipping rules (see [7.6](#76-render-a-folder-ursotts-batch)).
+This does exactly what `ursotts batch` does, with the same files and the same skipping rules (see [8.6](#86-render-a-folder-ursotts-batch)).
 
 <sub>[↑ Back to contents](#contents)</sub>
 
-## 7. Using the command line in the terminal
+## 7. Using the ursoTTS desktop app
 
-Here you type `ursotts` commands yourself, without Claude. It's the most direct way and great for quick, repeated runs, but the commands must be typed exactly. If a command fails, you can always paste the error into Claude Code (see [chapter 4](#4-using-claude-code-in-vs-code-and-the-desktop-app)).
+The same features as the web UI in a normal window, styled like VS Code Dark. Use it from your Python setup (`ursotts app`) or install it without Python (see [7.2](#72-install-without-python-dmg--exe)).
 
-### 7.1 Open a terminal and get ready
+### 7.1 Start the desktop app
+
+![The ursoTTS desktop app in the VS Code Dark style](images/app-speak.png)
+
+Prefer a normal window over a browser tab? The desktop app has the same features, styled like VS Code Dark.
+
+**Start** it from Claude Code:
+
+```
+Start the desktop app with `ursotts app`.
+```
+
+![The request in the Claude panel](images/7.1_prompt_claudecode.png)
+
+Or from a terminal, inside the project folder (see [chapter 8](#8-using-the-command-line-in-the-terminal)):
+
+```bash
+cd ~/Projects/ursotts
+source .venv/bin/activate
+ursotts app
+```
+
+![Terminal: ursotts app fails until you cd into the folder and activate the environment](images/7.1_prompt_terminal.png)
+
+The first line in this screenshot shows the most common mistake: `ursotts app` gives *command not found* until you go to the project folder and turn on the environment.
+
+Installed it from a `.dmg` or `.exe` (see [7.2](#72-install-without-python-dmg--exe))? Just open **ursoTTS** like any other app.
+
+| Part | What it does |
+|---|---|
+| **Activity bar** (far left) | Microphone = Speak · Text = Pronunciation · Folder = Batch · Terminal = Claude Code · Gear (bottom) opens `config.yaml`; the selected view is coral |
+| **Sidebar** | Language, voices (with **+ Add voice file…**), speaking style and the list of output files; drag its edge to resize |
+| **Editor** | Your script with line numbers and colors (comments, `@lang`, `[pause]`); **Open…**, **Save as…** and **Generate narration** |
+| **OUTPUT panel** | The live log with timings; **⌘J** shows or hides it |
+| **Status bar** | Version, engine and whether the voice model is loaded |
+
+<p><img src="images/app-pronunciation.png" width="49%" alt="Desktop app: the Pronunciation view"> <img src="images/app-batch.png" width="49%" alt="Desktop app: the Batch view"></p>
+
+Shortcuts: **⌘↵** runs the current view, **⌘1–4** switch views, **⌘O** opens a script, **⌘S** saves it (**⇧⌘S** saves under a new name), **⌘+** / **⌘−** zoom in and out (70–160%), **⌘0** returns to 100%. In Batch, the folder dialog has a **New Folder** button. The window remembers its size, zoom, panels, last view, script and folders.
+
+The desktop app uses Tkinter, which comes with Python from python.org. With Homebrew's Python, install it once with `brew install python-tk@3.13` (match your Python version). The web UI keeps working either way.
+
+**Saving and closing.** Narration files are saved as soon as they're made (in `output/app/`), and the editor's text is kept for next time. When the script belongs to a file you opened or saved, a **●** in the tab means unsaved changes, and the app asks before closing. It also asks before quitting while narration is still being made.
+
+**Without keeping a terminal open.** `ursotts app` needs its terminal window to stay open. Two ways around that:
+
+- `ursotts app --detach` starts the app in the background; you can close the terminal right away.
+- `ursotts make-launcher` (or **File → Create launcher…** in the app) creates a double-click launcher: **ursoTTS** in your home folder's Applications on a Mac (drag it to the Dock if you like), a Desktop and Start-menu shortcut on Windows, or a menu entry on Linux. Run it once, from inside the project folder.
+
+### 7.2 Install without Python (.dmg / .exe)
+
+![The ursoTTS splash screen](images/app-splash.png)
+
+The desktop app is also available as a normal installer, for people who don't want to use Python or the terminal. Download it from the [latest release](https://github.com/ursomics/ursotts/releases/latest): `ursoTTS-1.0.0-mac-arm64.dmg` for a Mac with Apple Silicon (open it and drag ursoTTS into Applications), or `ursoTTS-1.0.0-windows-setup.exe` for Windows. The version number in the name changes with each release.
+
+- **First open:** the installers aren't signed with a paid certificate yet. On a Mac, right-click ursoTTS → **Open** → **Open**; on Windows, click **More info** → **Run anyway**. You only do this once.
+- **Your files:** the installed app works in a **`ursoTTS`** folder in your home folder, created on first launch with the default settings and example scripts. Add your voice with **+ Add voice file…**; results go to `output/`.
+- **Voice model:** downloaded once with your first narration (a few GB, internet needed).
+- **Claude Code view:** in the installed app it works in Ask mode only, because the app's own code is sealed inside the installer. To change the app, use the source version.
+- **MP3 export** works without installing ffmpeg; a copy is included.
+
+<p><img src="images/app-installed.png" width="68%" alt="The installed app on first launch, working in ~/ursoTTS"> <img src="images/app-about.png" width="29%" alt="Help → About ursoTTS"></p>
+
+On first launch the voice lists are empty: add your sample with **+ Add voice file…**. **Help → About ursoTTS** shows the version.
+
+### 7.3 Change the app with Claude Code
+
+![The Claude Code view in the desktop app](images/app-claude.png)
+
+The **Claude Code** view (the terminal icon) lets you change the app itself by asking in plain words, for example "Make the sidebar 340 px wide" or "Add a Speed slider". It runs the Claude Code command line (`claude`) with the same Claude login you use in VS Code.
+
+1. Choose a mode: **Ask** (Claude explains and changes nothing) or **Edit the app**.
+2. Type your request, or pick one of the **Ideas**, and click **Send to Claude** (**⌘↵**). The transcript shows what Claude reads and edits.
+3. Click **⟳ Restart app** to see the change.
+4. Don't like it? Click **↶ Undo last change**. The app saves a backup of its own files before every edit (the last five are kept in `.cache/claude_undo/`), then restart again.
+
+In Edit mode, Claude can only read and edit files: no terminal commands or installs. **Open in VS Code** opens the project there so you can review the changes; **Copy request for VS Code** copies your request, with the right context, for the Claude panel in VS Code. The Claude view needs the Claude Code command line (see [5.1](#51-install-it)); without it, use the copy button.
+
+<sub>[↑ Back to contents](#contents)</sub>
+
+## 8. Using the command line in the terminal
+
+Here you type `ursotts` commands yourself, without Claude. It's the most direct way and great for quick, repeated runs, but the commands must be typed exactly. If a command fails, you can always paste the error into Claude Code (see [chapter 4](#4-using-claude-code-in-vs-code-and-the-claude-desktop-app)).
+
+### 8.1 Open a terminal and get ready
 
 Open **Terminal** (on a Mac: press **Cmd+Space**, type *Terminal*, press **Enter**), or the integrated terminal in VS Code (**Ctrl+~**), which already opens in the project folder.
 
@@ -498,7 +658,7 @@ source .venv/bin/activate         # turn on the environment; the prompt shows (.
 
 Run the `cd` and `source` lines every time you open a new terminal. On Windows, activate with `.venv\Scripts\activate`.
 
-### 7.2 Commands at a glance
+### 8.2 Commands at a glance
 
 | Command | What it does |
 |---|---|
@@ -507,9 +667,13 @@ Run the `cd` and `source` lines every time you open a new terminal. On Windows, 
 | `ursotts say "TEXT" -o FILE` | Makes one sentence or short text |
 | `ursotts batch IN_FOLDER OUT_FOLDER` | Makes every script in a folder |
 | `ursotts ui` | Starts the web UI |
+| `ursotts app` | Opens the desktop app (see [chapter 7](#7-using-the-ursotts-desktop-app)); add `--detach` to close the terminal afterwards |
+| `ursotts make-launcher` | Creates a double-click launcher for the desktop app (see [7.1](#71-start-the-desktop-app)) |
 | `ursotts --help`, `ursotts batch --help` | Lists every command, or one command's options |
 
-### 7.3 Check your setup: `ursotts check`
+![ursotts --help lists every command](images/terminal-help.png)
+
+### 8.3 Check your setup: `ursotts check`
 
 ```bash
 ursotts check
@@ -518,7 +682,7 @@ ursotts check
 A healthy setup looks like this:
 
 ```
-ursotts 0.6.7
+ursotts 1.0.0
 engine: chatterbox
 torch 2.6.0 | best device: mps
 chatterbox: installed
@@ -529,7 +693,11 @@ voice[ko]: /Users/you/Projects/ursotts/voices/my_voice_ko.wav OK
 
 Anything marked *NOT installed*, *not found* or *MISSING* tells you what to fix.
 
-### 7.4 Preview a script: `ursotts preview`
+![ursotts check on a Mac with all items OK](images/8.3_terminal_check.png)
+
+Warnings such as *pkg_resources is deprecated* come from libraries ursoTTS uses. They're harmless and can be ignored.
+
+### 8.4 Preview a script: `ursotts preview`
 
 ```bash
 ursotts preview scripts/01_intro_en.txt
@@ -543,9 +711,11 @@ Shows each chunk with its language and the exact text the voice will read, plus 
 [en] First, we load the count matrix into Ann Data.
 ```
 
-Use it to check pronunciation spellings (see [8.3](#83-fix-pronunciation)) and language detection before rendering.
+![ursotts preview shows each chunk, its language and the pauses](images/terminal-preview.png)
 
-### 7.5 Make one sentence: `ursotts say`
+Use it to check pronunciation spellings (see [9.3](#93-fix-pronunciation)) and language detection before rendering.
+
+### 8.5 Make one sentence: `ursotts say`
 
 ```bash
 ursotts say "Welcome to Ursomics." -o output/hello.wav
@@ -561,7 +731,7 @@ ursotts say "안녕하세요, Ursomics입니다." -o output/hello_ko.wav --lang 
 
 Put the text in quotes, especially when it contains spaces or Korean.
 
-### 7.6 Render a folder: `ursotts batch`
+### 8.6 Render a folder: `ursotts batch`
 
 ```bash
 ursotts batch scripts output
@@ -581,7 +751,11 @@ output/name.wav   output/name.mp3   output/name.srt   output/batch_report.json
 
 Running `batch` again skips scripts whose text and settings haven't changed, and even with `--force` only the changed sentences are generated again. `batch_report.json` lists each script's length, which is handy for checking video timing.
 
-### 7.7 Start the web UI: `ursotts ui`
+![ursotts batch running: the model loads, then each sentence is made](images/8.6_terminal_batch.png)
+
+The first run loads the voice model and prints some warnings (for example about a Hugging Face token or repeated tokens). They're harmless; the narration is still made correctly.
+
+### 8.7 Start the web UI: `ursotts ui`
 
 ```bash
 ursotts ui
@@ -596,7 +770,7 @@ ursotts ui
 
 Press **Ctrl+C** to stop it. Details are in [6.1](#61-start-and-stop-it).
 
-### 7.8 Handy keys and tips
+### 8.8 Handy keys and tips
 
 | Key or tip | What it does |
 |---|---|
@@ -608,11 +782,23 @@ Press **Ctrl+C** to stop it. Details are in [6.1](#61-start-and-stop-it).
 
 > **ffmpeg uses a single dash:** `ffmpeg -version`, not `ffmpeg --version`. Most other tools (`python --version`, `git --version`) use two.
 
+### 8.9 Windows and servers
+
+- **Windows:** the web UI, the desktop app and the terminal commands all work. An NVIDIA GPU is fastest; install ffmpeg with `winget install ffmpeg` and activate with `.venv\Scripts\activate`. The desktop app plays WAV files with Windows' built-in player, so ■ Stop works. A Windows installer is also available (see [7.2](#72-install-without-python-dmg--exe)).
+- **AWS EC2:** use `ursotts batch` or the web UI; the desktop app needs a screen, so it doesn't run there. Open the web UI through an SSH tunnel, `ssh -L 7860:localhost:7860 you@your-ec2-host`, then go to http://localhost:7860 on your own computer. Don't use `--share` or open port 7860 to the internet.
+- **S3:** ursoTTS works with ordinary folders, so copy files in and out with `aws s3 sync`:
+
+```bash
+aws s3 sync s3://your-bucket/scripts scripts/
+ursotts batch scripts output
+aws s3 sync output/ s3://your-bucket/narration/
+```
+
 <sub>[↑ Back to contents](#contents)</sub>
 
-## 8. Making narration
+## 9. Making narration
 
-### 8.1 Record your voice samples
+### 9.1 Record your voice samples
 
 - **10–30 seconds** of natural speech in the style of your videos.
 - A quiet room, no music, one speaker, a steady distance from the microphone.
@@ -625,11 +811,11 @@ Convert ~/Desktop/my_voice_en.m4a to voices/my_voice_en.wav: mono, 24 kHz,
 trim silence at the start and end. Tell me the final length in seconds.
 ```
 
-You can also record a sample directly in the web UI (**Speak** tab → *Record or upload a sample*).
+You can also record a sample directly in the web UI (**Speak** tab → *Record or upload a new sample*) or add one in the desktop app (**+ Add voice file…**).
 
 **A sample made by another TTS service works for testing**, but cloning a clone loses some naturalness. Your own recording gives the best result.
 
-### 8.2 Write scripts
+### 9.2 Write scripts
 
 ```text
 @lang en
@@ -649,13 +835,13 @@ A new paragraph gets a slightly longer pause. [pause 1.5] You can also add pause
 
 **When to force the language:** in a Korean script that contains whole English sentences (a paper title, for example), `auto` switches to the English voice sample for those sentences. If you want one consistent voice reading English with your Korean accent, put `@lang ko` at the top.
 
-### 8.3 Fix pronunciation
+### 9.3 Fix pronunciation
 
 Gene names and abbreviations rarely sound right on their own. ursoTTS handles the common case automatically and lets you define everything else once, in `pronunciations.yaml`. Every video then uses it. Subtitles always keep the original spelling.
 
 #### Automatic: abbreviations
 
-All-caps words of 2–6 letters are spelled as one smooth word:
+All-caps words of 2–6 letters are read letter by letter, smoothly:
 
 | In your script | The voice reads |
 |---|---|
@@ -726,7 +912,7 @@ NANOG: NAN.og. Sounds like: NAN as in "man", og as in "dog", one smooth word.
 KIR: kur. Sounds like: rhymes with "fur".
 ```
 
-### 8.4 Tune the speaking style
+### 9.4 Tune the speaking style
 
 | config.yaml | Web UI | Effect |
 |---|---|---|
@@ -743,21 +929,22 @@ slower and slightly more expressive, then re-render output/test1.wav.
 
 <sub>[↑ Back to contents](#contents)</sub>
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 
 | What you see | Cause and fix |
 |---|---|
 | `Voice sample(s) missing` | You're not in the project folder (`pwd`), or the files in `voices/` don't match the names in `config.yaml`. |
 | The narration sounds like a stranger | The voice sample is too short or noisy, or `@lang auto` switched to the other language's sample. Use 10–30 s of clean speech and check `ursotts preview`. |
 | `command not found: ursotts` | The environment isn't active: run `source .venv/bin/activate`. |
-| Strange errors after moving or renaming the folder | The `.venv` broke. Delete it and run step 3 of [4.7](#47-install-ursotts-with-claude-code) again. |
+| Strange errors after moving or renaming the folder | The `.venv` broke. Delete it and run step 3 of [4.7](#47-install-ursotts-with-claude-code-vs-code-and-desktop-app) again. |
 | `Unrecognized option '-version'` | You typed `ffmpeg --version`; use `ffmpeg -version`. |
 | First run is very slow | It's downloading the model (a few GB). Later runs are fast. |
+| Each sentence takes several seconds; the log shows "…/1000" | Normal. The voice model writes speech in small pieces (about 25 per second of audio), so a 5-second sentence takes roughly 10 seconds on an Apple Silicon Mac, and longer on CPU only. 1000 is only the maximum: it stops as soon as the sentence ends. |
 | Settings changed but nothing re-rendered | Check that you edited the `config.yaml` in the folder you run from. |
 | `No module named pkg_resources` when Chatterbox loads | Reinstall with `pip install -e ".[all]"`; it pins `setuptools<81`, which Chatterbox's watermarker still needs. |
 | Install fails on a very new Python | Some dependencies lag behind new Python releases. Try Python 3.11–3.13. |
 | Claude Code's panel shows no Spark icon | Open a file first, or use the **✻ Claude Code** button in the status bar. |
-| Abbreviations or names sound choppy ("R … N … A", "Ur … So … mics") | A respelling in `pronunciations.yaml` separates letters with spaces or hyphens. Write letters with dots (`R.N.A.`) and word-like sounds as dot-joined syllables (`ur.SOH.miks`). See [8.3](#83-fix-pronunciation). |
+| Abbreviations or names sound choppy ("R … N … A", "Ur … So … mics") | A respelling in `pronunciations.yaml` separates letters with spaces or hyphens. Write letters with dots (`R.N.A.`) and word-like sounds as dot-joined syllables (`ur.SOH.miks`). See [9.3](#93-fix-pronunciation). |
 | Anything else | In Claude Code: "That failed. Look at @terminal:zsh, find the cause, and fix it." |
 
 ---

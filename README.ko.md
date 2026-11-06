@@ -30,7 +30,7 @@
 
 ---
 
-**영상 크리에이터를 위한 보이스 클로닝 일괄 내레이션.** 대본을 일반 텍스트 파일로 쓰고, 목소리를 한 번만 녹음하면, 모든 영상의 내레이션(WAV + MP3 + 자막)이 완성됩니다. 오픈소스 모델로 내 컴퓨터에서 실행되므로 글자 수 단위 요금이 없습니다. 명령줄에서도, 브라우저의 간단한 웹 페이지에서도 쓸 수 있습니다.
+**ursoTTS™: 영상 크리에이터를 위한 보이스 클로닝 일괄 내레이션.** 대본을 일반 텍스트 파일로 쓰고, 목소리를 한 번만 녹음하면, 모든 영상의 내레이션(WAV + MP3 + 자막)이 완성됩니다. 오픈소스 모델로 내 컴퓨터에서 실행되므로 글자 수 단위 요금이 없습니다. 데스크톱 앱, 브라우저의 간단한 웹 페이지, 명령줄 어디서든 쓸 수 있습니다.
 
 [@ursomics](https://youtube.com/@ursomics) 생물정보학 영상 시리즈(영어 + 한국어)를 위해 만들었고, Claude Code로 개발했습니다.
 
@@ -74,6 +74,21 @@
 - **접근성:** 문서의 오디오 버전과, 읽으며 보는 사람을 위한 자막.
 
 내 목소리, 또는 허락받은 목소리만 클로닝하세요.
+
+## 앱 내려받기 (Python 필요 없음)
+
+[최신 릴리스](https://github.com/ursomics/ursotts/releases/latest)에서 내 컴퓨터용 설치 파일을 받으세요:
+
+| 컴퓨터 | 파일 | 설치 |
+|---|---|---|
+| **Mac** (Apple Silicon) | `ursoTTS-1.0.0-mac-arm64.dmg` | 열고 **ursoTTS**를 **응용 프로그램(Applications)** 으로 끌어다 놓기 |
+| **Windows** (64비트) | `ursoTTS-1.0.0-windows-setup.exe` | 실행하고 안내 따르기 |
+
+- **처음 열 때:** 아직 유료 개발자 인증서로 서명되지 않아 처음 한 번 확인을 묻습니다. Mac: ursoTTS를 오른쪽 클릭 → **열기** → **열기**. Windows: **추가 정보** → **실행**.
+- **첫 내레이션**을 만들 때 목소리 모델(몇 GB)을 한 번 내려받으므로, 처음에는 인터넷 연결이 필요합니다.
+- 내 파일은 홈 폴더의 **`ursoTTS`** 폴더에 있습니다. 목소리 샘플은 `voices/`, 대본은 `scripts/`에 넣고, 결과는 `output/`에서 찾으세요.
+
+명령줄이나 웹 UI를 쓰려면 아래 빠른 시작대로 소스에서 설치하세요.
 
 ## 빠른 시작
 
@@ -119,6 +134,16 @@ ursotts ui
 - **Batch 탭:** 대본 폴더와 출력 폴더를 고르거나 새로 만든 뒤 전체를 만듭니다. `ursotts batch`와 같습니다.
 
 탭마다 쓰는 법은 [매뉴얼](docs/MANUAL.ko.md#6-웹-ui-사용하기)에 단계별로 있습니다.
+
+### 데스크톱 앱으로
+
+<p align="center"><img src="docs/images/app-speak.png" alt="ursoTTS 데스크톱 앱" width="92%"></p>
+
+```bash
+ursotts app
+```
+
+같은 Speak, Pronunciation, Batch 기능을 VS Code Dark 스타일의 일반 창에서 씁니다. 액티비티 바, 크기 조절되는 사이드바, 줄 번호가 있는 대본 편집기, 실시간 기록이 보이는 OUTPUT 패널이 있습니다. 내장된 **Claude Code** 화면에서 말로 요청해 앱의 모양과 기능을 바꿀 수 있고, 한 번에 되돌릴 수도 있습니다. [매뉴얼](docs/MANUAL.ko.md#7-ursotts-데스크톱-앱-쓰기)을 참고하세요.
 
 ### 터미널에서
 
@@ -169,7 +194,7 @@ ko:
 
 한영 혼합 대본이라면 맨 위에 `@lang ko`를 쓰세요. 영어 용어가 많은 한국어 문장도 한국어 목소리와 `ko:` 사전으로 일정하게 읽힙니다([한영 혼합 대본의 발음](docs/MANUAL.ko.md#한영-혼합-대본의-발음)).
 
-유전자 이름이 가득한 테스트 대본이 `examples/`에 있습니다. 소리를 Claude에게 설명하는 방법을 포함한 전체 안내는 [매뉴얼](docs/MANUAL.ko.md#83-발음-고치기)을 보세요.
+유전자 이름이 가득한 테스트 대본이 `examples/`에 있습니다. 소리를 Claude에게 설명하는 방법을 포함한 전체 안내는 [매뉴얼](docs/MANUAL.ko.md#93-발음-고치기)을 보세요.
 
 ## 스크립트 형식
 
@@ -229,3 +254,5 @@ Anthropic과 제휴하거나 Anthropic의 보증을 받은 프로젝트가 아�
   <img src="docs/brand/avatar_160.png" width="72" alt="ursoTTS 곰"><br>
   <sub>Made with <img src="docs/brand/avatar_160.png" height="18" alt="ursoTTS bear"> by <a href="https://github.com/ursomics">ursomics@GitHub</a> · <a href="https://ursomics.com">ursomics.com</a> · <a href="https://youtube.com/@ursomics">@ursomics</a></sub>
 </p>
+
+함께 들어 있는 **Poppins** 글꼴은 © The Poppins Project Authors이며, SIL Open Font License 1.1을 따릅니다(`ursotts/assets/fonts/OFL.txt`).

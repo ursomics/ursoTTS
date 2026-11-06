@@ -9,6 +9,19 @@ import numpy as np
 import soundfile as sf
 
 
+
+def find_ffmpeg() -> str | None:
+    """ffmpeg on PATH, else the copy bundled with the imageio-ffmpeg package
+    (so MP3 export also works in the installed app without a separate ffmpeg)."""
+    ff = shutil.which("ffmpeg")
+    if ff:
+        return ff
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        return None
+
 def silence(seconds: float, sr: int) -> np.ndarray:
     return np.zeros(int(round(seconds * sr)), dtype=np.float32)
 
@@ -45,7 +58,7 @@ def read_wav(path) -> tuple[np.ndarray, int]:
 
 def to_mp3(wav_path, mp3_path, loudnorm: bool = True) -> bool:
     """Export MP3 with ffmpeg; loudnorm targets YouTube's -14 LUFS."""
-    ff = shutil.which("ffmpeg")
+    ff = find_ffmpeg()
     if not ff:
         return False
     cmd = [ff, "-y", "-loglevel", "error", "-i", str(wav_path)]
