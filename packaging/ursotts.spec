@@ -5,7 +5,7 @@ import re
 import sys
 from pathlib import Path
 
-from PyInstaller.utils.hooks import collect_all
+from PyInstaller.utils.hooks import collect_all, copy_metadata
 
 ROOT = Path(SPECPATH).parent
 VERSION = re.search(r'__version__ = "([^"]+)"', (ROOT / "ursotts" / "__init__.py").read_text()).group(1)
@@ -32,6 +32,17 @@ for pkg in ("chatterbox", "perth", "s3tokenizer", "librosa", "conformer", "diffu
     try:
         d, b, h = collect_all(pkg)
         datas += d; binaries += b; hiddenimports += h
+    except Exception:
+        pass
+
+# transformers/diffusers/etc. check their dependencies at import time through importlib.metadata
+# (e.g. "The 'requests' distribution was not found"), so the installed package metadata
+# (.dist-info) must ship inside the app too. recursive=True also pulls in their dependencies.
+for dist in ("chatterbox-tts", "transformers", "diffusers", "huggingface-hub", "tokenizers", "safetensors",
+             "requests", "tqdm", "regex", "packaging", "filelock", "numpy", "pyyaml", "torch", "torchaudio",
+             "librosa", "resemble-perth", "s3tokenizer", "conformer", "accelerate"):
+    try:
+        datas += copy_metadata(dist, recursive=True)
     except Exception:
         pass
 
