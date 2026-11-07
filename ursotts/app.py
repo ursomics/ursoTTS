@@ -1388,7 +1388,11 @@ class App:
         if FROZEN:
             self.cc_note.configure(text=tr("In the installed app, Claude can explain things but can't edit the "
                                            "app itself. To change the app, use the source version "
-                                           "(pip install) and its Edit mode, or Claude Code in VS Code."))
+                                           "(pip install) and its Edit mode, or Claude Code in VS Code.\n"
+                                           "This panel needs the Claude Code command line and your Claude login. "
+                                           "Answers can take a minute or more. While Claude works, this panel shows "
+                                           "only the names of the tools it uses (for example “Bash” or “Read”), "
+                                           "not their details. Use Stop to cancel."))
         elif self.claude_path():
             self.cc_note.configure(text=tr("Uses the Claude Code command line with the same Claude login as "
                                            "VS Code. Edits are limited to reading and editing files; a backup "

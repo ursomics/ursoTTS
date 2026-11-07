@@ -185,9 +185,16 @@ KO = {
     "Ask Claude Code to change or explain this app": "Claude Code에게 이 앱의 변경이나 설명을 요청하세요",
     "Send to Claude": "Claude에게 보내기",
     "In the installed app, Claude can explain things but can't edit the app itself. "
-    "To change the app, use the source version (pip install) and its Edit mode, or Claude Code in VS Code.":
+    "To change the app, use the source version (pip install) and its Edit mode, or Claude Code in VS Code.\n"
+    "This panel needs the Claude Code command line and your Claude login. "
+    "Answers can take a minute or more. While Claude works, this panel shows "
+    "only the names of the tools it uses (for example “Bash” or “Read”), "
+    "not their details. Use Stop to cancel.":
         "설치된 앱에서는 Claude가 설명은 해 줄 수 있지만 앱 자체를 수정할 수는 없습니다. "
-        "앱을 바꾸려면 소스 버전(pip install)의 수정 모드나 VS Code의 Claude Code를 사용하세요.",
+        "앱을 바꾸려면 소스 버전(pip install)의 수정 모드나 VS Code의 Claude Code를 사용하세요.\n"
+        "이 패널을 쓰려면 Claude Code 명령줄 도구와 Claude 로그인이 필요합니다. "
+        "답변에 1분 이상 걸릴 수 있습니다. 작업 중에는 Claude가 사용하는 도구 이름(예: “Bash”, “Read”)만 "
+        "표시되고 자세한 내용은 보이지 않습니다. 취소하려면 ■ 중지를 누르세요.",
     "Uses the Claude Code command line with the same Claude login as VS Code. "
     "Edits are limited to reading and editing files; a backup is saved first, so Undo restores the previous version.":
         "VS Code와 같은 Claude 로그인으로 Claude Code 명령줄을 사용합니다. "
