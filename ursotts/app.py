@@ -27,7 +27,8 @@ import yaml
 from . import __version__, audio, i18n
 from .pipeline import Synthesizer, missing_voices, plan_batch, process_file, run_batch
 from .shared import (AUDIO_EXTS, CORAL, DEEP_CORAL, LANGS, MAX_CANDIDATES, UserError,
-                     prepare_sample, suggest_spellings, upsert_pronunciation)
+                     prepare_sample, suggest_spellings, upsert_pronunciation,
+                     read_pronunciations, remove_pronunciation)
 from .i18n import tr, tr_exc, tr_line
 from .text import Speech, render_say
 
@@ -572,6 +573,7 @@ class App:
         helpm = tk.Menu(m, tearoff=False)
         helpm.add_command(label=tr("ursoTTS manual"), command=self.open_manual)
         helpm.add_command(label=tr("Open config.yaml"), command=self.open_settings)
+        helpm.add_command(label=tr("Open pronunciations.yaml"), command=self.open_pron_file)
         helpm.add_separator()
         helpm.add_command(label=tr("About ursoTTS"), command=self.about)
         m.add_cascade(label=tr("Help"), menu=helpm)
@@ -1049,6 +1051,25 @@ class App:
         self.entry(bottom, self.like, width=60, bg=BG).pack(fill="x", pady=(2, 10))
         self.button(bottom, "Save to pronunciation rules", self.save_pron, primary=True, bg=BG).pack(anchor="w")
 
+        self.label(main, "Saved rules", "small", fg=FG_DIM, bg=BG).pack(fill="x", padx=16, pady=(14, 4))
+        box = tk.Frame(main, bg=BG)
+        box.pack(fill="both", expand=True, padx=16)
+        sb = tk.Scrollbar(box)
+        sb.pack(side="right", fill="y")
+        self.rules = tk.Listbox(box, bg=BG, fg=EDITOR_FG, font=self.fonts["mono"], relief="flat", height=8,
+                                highlightthickness=1, highlightbackground=BORDER, selectbackground=SELECT,
+                                activestyle="none", exportselection=False, yscrollcommand=sb.set)
+        self.rules.pack(side="left", fill="both", expand=True)
+        sb.configure(command=self.rules.yview)
+        self.rules.bind("<Double-Button-1>", lambda e: self.load_rule())
+        self.rule_keys: list[tuple[str, str]] = []
+        rbar = tk.Frame(main, bg=BG)
+        rbar.pack(fill="x", padx=16, pady=(8, 12))
+        self.button(rbar, "Load into editor", self.load_rule, bg=BG).pack(side="left")
+        self.button(rbar, "Delete rule", self.delete_rule, bg=BG).pack(side="left", padx=6)
+        self.button(rbar, "↻ Refresh list", self.refresh_rules, bg=BG).pack(side="left")
+        self.refresh_rules()
+
     def suggest(self):
         term = self.term.get().strip()
         if not term:
@@ -1105,12 +1126,73 @@ class App:
             messagebox.showinfo("Pronunciation", "Listen to the versions and choose the best one first.")
             return
         lang = "ko" if self.pron_lang.get() == tr("Korean") else "en"
-        path = Path(self.cfg.get("pronunciations_path") or "pronunciations.yaml")
+        path = self._pron_path()
         upsert_pronunciation(path, lang, term, choice, self.like.get())
         self.cfg["pronunciation_table"] = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         self.log(tr("Saved {term} → {choice} (voice reads “{spoken}”). "
                     "Scripts that use it are re-rendered on the next batch.",
                     term=term, choice=choice, spoken=render_say(choice)) + "\n", "accent")
+        self.refresh_rules()
+
+    def _pron_path(self) -> Path:
+        return Path(self.cfg.get("pronunciations_path") or (self.project / "pronunciations.yaml"))
+
+    def refresh_rules(self):
+        table = read_pronunciations(self._pron_path())
+        self.rules.delete(0, "end")
+        self.rule_keys = []
+        for lang, name in (("en", tr("English")), ("ko", tr("Korean"))):
+            for term, (say, like) in sorted(table[lang].items(), key=lambda kv: kv[0].lower()):
+                note = f"   ({like})" if like else ""
+                self.rules.insert("end", f"[{name}]  {term}  →  {say}{note}")
+                self.rule_keys.append((lang, term))
+        if not self.rule_keys:
+            self.rules.insert("end", tr("No saved rules yet."))
+
+    def _selected_rule(self):
+        sel = self.rules.curselection()
+        if not sel or sel[0] >= len(self.rule_keys):
+            messagebox.showinfo("Pronunciation", "Select a rule in the list first.")
+            return None
+        return self.rule_keys[sel[0]]
+
+    def load_rule(self):
+        key = self._selected_rule()
+        if not key:
+            return
+        lang, term = key
+        say, like = read_pronunciations(self._pron_path())[lang].get(term, ("", ""))
+        self.term.set(term)
+        self.pron_lang.set(tr("Korean") if lang == "ko" else tr("English"))
+        self.like.set(like)
+        versions = [say] + [c for c in suggest_spellings(term, self.cfg, lang) if c != say]
+        self.cands.delete("1.0", "end")
+        self.cands.insert("1.0", "\n".join(versions[:MAX_CANDIDATES]))
+
+    def delete_rule(self):
+        key = self._selected_rule()
+        if not key:
+            return
+        lang, term = key
+        if not messagebox.askyesno("Pronunciation", tr("Delete the rule for “{term}”?", term=term)):
+            return
+        path = self._pron_path()
+        if remove_pronunciation(path, lang, term):
+            self.cfg["pronunciation_table"] = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+            self.log(tr("Deleted the rule for {term}.", term=term) + "\n", "accent")
+        self.refresh_rules()
+
+    def open_pron_file(self):
+        path = self._pron_path().resolve()
+        if not path.exists():
+            messagebox.showinfo("Pronunciation", "No pronunciation rules file yet. Save a rule first.")
+            return
+        if sys.platform == "darwin":
+            subprocess.Popen(["open", "-t", str(path)])
+        elif sys.platform.startswith("win"):
+            os.startfile(str(path))  # noqa: S606
+        else:
+            subprocess.Popen(["xdg-open", str(path)])
 
     # ------------------------------------------------------------- batch
     def _build_batch(self):

@@ -128,6 +128,16 @@ KO = {
     "Saved {term} → {choice} (voice reads “{spoken}”). Scripts that use it are re-rendered on the next batch.":
         "{term} → {choice} 저장됨 (읽는 소리: “{spoken}”). 이 규칙을 쓰는 스크립트는 다음 일괄 변환 때 다시 변환됩니다.",
 
+    "Saved rules": "저장된 규칙",
+    "Load into editor": "편집 칸으로 불러오기",
+    "Delete rule": "규칙 삭제",
+    "No saved rules yet.": "저장된 규칙이 아직 없습니다.",
+    "Select a rule in the list first.": "먼저 목록에서 규칙을 선택하세요.",
+    "Delete the rule for “{term}”?": "“{term}” 규칙을 삭제할까요?",
+    "Deleted the rule for {term}.": "{term} 규칙을 삭제했습니다.",
+    "Open pronunciations.yaml": "pronunciations.yaml 열기",
+    "No pronunciation rules file yet. Save a rule first.": "발음 규칙 파일이 아직 없습니다. 먼저 규칙을 저장하세요.",
+
     # ---- batch tab
     "Scripts folder": "스크립트 폴더",
     "Output folder": "출력 폴더",

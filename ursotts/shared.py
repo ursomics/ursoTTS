@@ -176,6 +176,46 @@ def upsert_pronunciation(path: Path, lang: str, term: str, say: str, like: str =
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def read_pronunciations(path: Path) -> dict:
+    """{'en': {term: (say, like)}, 'ko': {...}} from pronunciations.yaml (empty when missing)."""
+    import yaml
+    try:
+        raw = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError):
+        return {"en": {}, "ko": {}}
+    out = {}
+    for lang in ("en", "ko"):
+        rows = {}
+        for term, v in (raw.get(lang) or {}).items():
+            if isinstance(v, dict):
+                rows[str(term)] = (str(v.get("say", "")), str(v.get("like", "") or ""))
+            else:
+                rows[str(term)] = (str(v), "")
+        out[lang] = rows
+    return out
+
+
+def remove_pronunciation(path: Path, lang: str, term: str) -> bool:
+    """Delete one entry from pronunciations.yaml, keeping every comment. True if a line was removed."""
+    path = Path(path)
+    if not path.exists():
+        return False
+    lines = path.read_text(encoding="utf-8").splitlines()
+    head = next((i for i, l in enumerate(lines) if re.match(rf"^{lang}:\s*(#.*)?$", l)), None)
+    if head is None:
+        return False
+    end = head + 1
+    while end < len(lines) and (lines[end].startswith(" ") or not lines[end].strip()):
+        end += 1
+    key_re = re.compile(rf"^\s+[\"']?{re.escape(term)}[\"']?\s*:")
+    hit = next((i for i in range(head + 1, end) if key_re.match(lines[i])), None)
+    if hit is None:
+        return False
+    del lines[hit]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return True
+
+
 # ursoTTS brand palette (see docs/brand/color_palette.png)
 CORAL, DEEP_CORAL, SOFT_CORAL = "#D97757", "#C4623F", "#F0C9B8"
 INK, WHITE, CREAM = "#1B1B1B", "#FFFFFF", "#F6EFE6"
