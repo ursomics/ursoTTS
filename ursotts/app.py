@@ -376,8 +376,12 @@ class App:
         try:
             if sys.platform.startswith("win"):
                 r.iconbitmap(str(ASSETS / "icons" / "ursotts.ico"))
-            self._icons = [tk.PhotoImage(file=str(ASSETS / "icons" / f"icon_{n}.png")) for n in (32, 64, 128, 256)]
-            r.iconphoto(True, *self._icons)
+            # Tk uses the FIRST image for the Dock / taskbar icon, so the largest goes first (a 32 px
+            # first image looked pixelated). The installed Mac app keeps the sharp icon from its bundle.
+            if not (sys.platform == "darwin" and FROZEN):
+                self._icons = [tk.PhotoImage(file=str(ASSETS / "icons" / f"icon_{n}.png"))
+                               for n in (512, 256, 128, 64, 32)]
+                r.iconphoto(True, *self._icons)
         except tk.TclError:
             pass
         s = ttk.Style(r)
