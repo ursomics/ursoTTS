@@ -610,16 +610,18 @@ ursotts app
 | 부분 | 기능 |
 |---|---|
 | **액티비티 바** (맨 왼쪽) | 마이크는 Speak, 텍스트는 Pronunciation, 폴더는 Batch, 터미널은 Claude Code 화면을 엽니다. 아래쪽 톱니바퀴를 누르면 `config.yaml`을 엽니다. 현재 선택한 화면은 코랄색으로 표시됩니다 |
-| **사이드바** | 언어와 목소리를 선택하고 말투를 조정할 수 있습니다. **+ Add voice file…**로 목소리 파일을 추가하고, 생성된 파일 목록도 확인할 수 있습니다. 가장자리를 끌어 너비를 조절합니다 |
+| **사이드바** | 언어와 목소리를 선택하고 말투를 조정할 수 있습니다. **● Record a voice sample…**로 바로 녹음하거나 **+ Add voice file…**로 목소리 파일을 추가하고, 생성된 파일 목록도 확인할 수 있습니다. 가장자리를 끌어 너비를 조절합니다 |
 | **편집기** | 대본을 편집합니다. 줄 번호가 표시되고 주석, `@lang`, `[pause]`가 색으로 구분됩니다. **Open…**, **Save as…**, **Generate narration** 버튼을 사용할 수 있습니다 |
 | **OUTPUT 패널** | 시간이 표시되는 실시간 기록을 보여 줍니다. **⌘J**를 눌러 패널을 표시하거나 숨깁니다 |
 | **상태 표시줄** | 버전, 엔진, 목소리 모델의 로드 상태를 보여 줍니다 |
 
 <p><img src="images/app-pronunciation.png" width="49%" alt="데스크톱 앱: Pronunciation 화면"> <img src="images/app-batch.png" width="49%" alt="데스크톱 앱: Batch 화면"></p>
 
-단축키: **⌘↵** 현재 화면 실행, **⌘1–4** 화면 전환, **⌘O** 대본 열기, **⌘S** 저장(**⇧⌘S** 다른 이름으로 저장), **⌘+** / **⌘−** 확대·축소(70~160%), **⌘0** 원래 크기(100%). Batch의 폴더 창에는 **New Folder** 버튼이 있습니다. 창 크기, 확대 수준, 패널, 마지막 화면, 대본, 폴더를 기억합니다.
+단축키: **⌘↵** 현재 화면 실행, **⌘1–4** 화면 전환, **⌘O** 대본 열기, **⌘S** 저장(**⇧⌘S** 다른 이름으로 저장), **⌘+** / **⌘−** 확대·축소(70~160%), **⌘0** 원래 크기(100%), **⌘K ⌘T** 색상 테마 선택. Batch의 폴더 창에는 **New Folder** 버튼이 있습니다. 창 크기, 확대 수준, 패널, 마지막 화면, 대본, 폴더를 기억합니다.
 
 데스크톱 앱은 Tkinter를 쓰며, python.org의 Python에는 기본으로 들어 있습니다. Homebrew의 Python이라면 `brew install python-tk@3.13`(내 Python 버전에 맞게)으로 한 번 설치하세요. 웹 UI는 어느 쪽이든 그대로 작동합니다.
+
+**색상 테마.** **View → Color Theme**을 고르거나 VS Code처럼 **⌘K** 다음 **⌘T**를 누르세요. Dark+, Light+, ursoTTS Cream, Monokai, Solarized Dark, Solarized Light, High Contrast 중에서 고를 수 있습니다. 창이 1초 정도 만에 새 색으로 다시 시작되며, 대본·폴더·레이아웃은 그대로 유지됩니다. 저장하지 않은 변경 사항이 있으면 먼저 묻습니다.
 
 **저장과 닫기.** 내레이션 파일은 만들어지는 즉시 `output/app/`에 저장되고, 편집기의 내용은 다음에 열 때 그대로 남아 있습니다. 열거나 저장한 파일의 대본이라면 탭의 **●** 표시가 저장하지 않은 변경 사항을 뜻하며, 닫기 전에 저장할지 묻습니다. 내레이션을 만드는 중에 끄려고 할 때도 먼저 확인합니다.
 
@@ -630,19 +632,39 @@ ursotts app
 
 ### 7.2 Python 없이 설치하기 (.dmg / .exe)
 
-![ursoTTS 시작 화면](images/app-splash.png)
+![ursoTTS 설치 창: ursoTTS를 응용 프로그램으로 끌어다 놓기](images/install-01-dmg.png)
 
 Python이나 터미널을 쓰고 싶지 않은 분을 위해 데스크톱 앱을 일반 설치 파일로도 제공합니다. [최신 릴리스](https://github.com/ursomics/ursotts/releases/latest)에서 받으세요. Apple Silicon Mac은 `ursoTTS-1.0.0-mac-arm64.dmg`(열고 ursoTTS를 응용 프로그램으로 끌어다 놓기), Windows는 `ursoTTS-1.0.0-windows-setup.exe`입니다. 파일 이름의 버전 번호는 릴리스마다 바뀝니다.
 
-- **처음 열 때:** 설치 파일은 아직 유료 인증서로 서명되지 않았습니다. Mac은 ursoTTS를 오른쪽 클릭 → **열기** → **열기**, Windows는 **추가 정보** → **실행**을 누르세요. 한 번만 하면 됩니다.
-- **내 파일:** 설치한 앱은 홈 폴더의 **`ursoTTS`** 폴더에서 작업합니다. 처음 실행할 때 기본 설정과 예제 대본과 함께 만들어집니다. 목소리는 **+ Add voice file…**로 추가하고, 결과는 `output/`에 저장됩니다.
+- **처음 열 때:** 설치 파일이 아직 유료 인증서로 서명되지 않아, 처음 한 번 직접 허용해야 합니다(아래 단계별 안내).
+- **내 파일:** 설치한 앱은 홈 폴더의 **`ursoTTS`** 폴더에서 작업합니다. 처음 실행할 때 기본 설정과 예제 대본과 함께 만들어집니다. 목소리는 **● Record a voice sample…**로 녹음하거나 **+ Add voice file…**로 추가하고, 결과는 `output/`에 저장됩니다.
 - **목소리 모델:** 첫 내레이션을 만들 때 한 번 내려받습니다(몇 GB, 인터넷 필요).
 - **Claude Code 화면:** 설치한 앱에서는 앱 코드가 설치 파일 안에 봉인되어 있어 Ask 모드만 됩니다. 앱을 바꾸려면 소스 버전을 쓰세요.
 - **MP3 내보내기**는 ffmpeg를 따로 설치하지 않아도 됩니다. 함께 들어 있습니다.
 
+**Mac에서 처음 열 때.** macOS는 아직 확인되지 않은 개발자의 앱을 막습니다. 한 번만 허용하면 됩니다:
+
+1. 응용 프로그램에서 **ursoTTS**를 엽니다. 앱을 확인할 수 없다는 메시지가 나오면 **완료**를 누릅니다.
+2. **시스템 설정 → 개인정보 보호 및 보안**을 열고 아래쪽 **보안** 항목으로 내려갑니다.
+3. *"ursoTTS"이(가) Mac을 보호하기 위해 차단되었습니다* 옆의 **그래도 열기**를 누릅니다.
+4. 확인 창에서 다시 **그래도 열기**를 누르고, 암호나 Touch ID로 승인합니다.
+
+![개인정보 보호 및 보안: 'ursoTTS가 차단됨' 옆의 그래도 열기](images/install-02-privacy-security.png)
+
+![확인 창: 그래도 열기](images/install-03-open-anyway.png)
+
+**Windows에서 처음 열 때.** 처음에는 Microsoft Defender SmartScreen이 설치 파일 실행을 막을 수 있습니다:
+
+1. *Windows의 PC 보호* 창에서 **추가 정보**를 누릅니다.
+2. 앱 이름이 **ursoTTS-1.0.0-windows-setup.exe**인지 확인한 뒤 **실행**을 누르고 설치 안내를 따릅니다.
+
+<p><img src="images/install-win-01-more-info.png" width="49%" alt="SmartScreen: 추가 정보 누르기"> <img src="images/install-win-02-run-anyway.png" width="49%" alt="SmartScreen: 실행"></p>
+
+이 과정은 처음 한 번만 하면 됩니다. 그다음부터는 다른 앱처럼 바로 열립니다.
+
 <p><img src="images/app-installed.png" width="68%" alt="처음 실행한 설치 앱 (~/ursoTTS에서 작업)"> <img src="images/app-about.png" width="29%" alt="Help → About ursoTTS"></p>
 
-처음 실행하면 목소리 목록이 비어 있습니다. **+ Add voice file…**로 샘플을 추가하세요. **Help → About ursoTTS**에서 버전을 볼 수 있습니다.
+처음 실행하면 목소리 목록이 비어 있습니다. **● Record a voice sample…**로 샘플을 녹음하거나(처음 한 번 macOS가 마이크 사용 권한을 묻습니다) **+ Add voice file…**로 파일을 추가하세요. **Help → About ursoTTS**에서 버전을 볼 수 있습니다.
 
 ### 7.3 Claude Code로 앱 바꾸기
 
@@ -832,7 +854,7 @@ aws s3 sync output/ s3://your-bucket/narration/
 
 ![휴대폰 녹음 변환 요청](images/KO_9.1_prompt.png)
 
-웹 UI에서 바로 녹음하거나(**Speak** 탭 → *Record or upload a new sample*), 데스크톱 앱에서 추가할 수도 있습니다(**+ Add voice file…**).
+웹 UI에서 바로 녹음하거나(**Speak** 탭 → *Record or upload a new sample*), 데스크톱 앱에서 녹음할 수도 있습니다(**● Record a voice sample…**, 이미 녹음한 파일은 **+ Add voice file…**).
 
 **다른 TTS 서비스로 만든 샘플도 테스트에는 쓸 수 있지만**, 클론을 다시 클로닝하면 자연스러움이 조금 떨어집니다. 직접 녹음한 목소리가 가장 좋습니다.
 

@@ -17,7 +17,7 @@ dependencies = ["numpy", "soundfile", "pyyaml", "imageio-ffmpeg"]   # imageio-ff
 # which setuptools 81+ removed.
 chatterbox = ["chatterbox-tts", "setuptools<81"]
 ui = ["gradio>=4.44"]
-all = ["chatterbox-tts", "setuptools<81", "gradio>=4.44"]
+all = ["chatterbox-tts", "setuptools<81", "gradio>=4.44", "sounddevice>=0.4.6"]   # sounddevice: recording in the desktop app
 
 [project.scripts]
 ursotts = "ursotts.cli:main"

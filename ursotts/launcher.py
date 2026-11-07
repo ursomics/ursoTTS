@@ -59,6 +59,7 @@ def make_mac_app(project: Path, python: str, dest_dir: Path | None = None) -> Pa
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>{__version__}</string>
   <key>NSHighResolutionCapable</key><true/>
+  <key>NSMicrophoneUsageDescription</key><string>ursoTTS uses the microphone to record your voice sample.</string>
 </dict></plist>
 """, encoding="utf-8")
     subprocess.run(["touch", str(app)], check=False)       # refresh Finder's icon cache

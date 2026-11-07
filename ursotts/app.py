@@ -317,6 +317,134 @@ class Choice(tk.Frame):
                               fill=ON_ACCENT, width=2.2, capstyle="round", joinstyle="round")
 
 
+class VoiceRecorder:
+    """A small recording window: Record / Stop, a timer and level meter, Play, then keep it as a voice."""
+    MAX_SECONDS, MIN_SECONDS, RATE = 30, 3, 44100
+
+    def __init__(self, app, sd):
+        self.app, self.sd = app, sd
+        self.frames, self.level, self.stream, self.started = [], 0.0, None, None
+        self.wav = None
+        f = app.fonts
+        self.win = win = tk.Toplevel(app.root, bg=SIDEBAR, padx=22, pady=18)
+        win.title("Record a voice sample")
+        win.transient(app.root)
+        win.resizable(False, False)
+        app.label(win, "Speak naturally for 10–30 seconds, in the style of your videos.", "ui").pack(anchor="w")
+        app.label(win, "A quiet room, one speaker, a steady distance from the microphone.", "small", fg=FG_DIM).pack(anchor="w", pady=(2, 12))
+        self.timer = tk.Label(win, text="0.0 s", font=(f["ui_b"].actual("family"), 28, "bold"), fg=FG_BRIGHT, bg=SIDEBAR)
+        self.timer.pack()
+        self.meter = tk.Canvas(win, width=360, height=10, bg=INPUT, highlightthickness=0)
+        self.meter.pack(pady=(6, 4))
+        self.hint = app.label(win, "Press Record when you're ready.", "small", fg=FG_DIM)
+        self.hint.pack(pady=(0, 12))
+        row = tk.Frame(win, bg=SIDEBAR)
+        row.pack()
+        self.rec_btn = app.button(row, "● Record", self.toggle, primary=True)
+        self.rec_btn.pack(side="left")
+        self.play_btn = app.button(row, "▶ Play", self.play)
+        self.play_btn.pack(side="left", padx=6)
+        name_row = tk.Frame(win, bg=SIDEBAR)
+        name_row.pack(fill="x", pady=(16, 0))
+        app.label(name_row, "Keep as", "small", fg=FG_DIM).pack(side="left")
+        self.name = tk.StringVar(value="my_voice_new")
+        app.entry(name_row, self.name, width=22).pack(side="left", padx=8)
+        self.save_btn = app.button(name_row, "Save to my voices", self.save, primary=True)
+        self.save_btn.pack(side="right")
+        win.protocol("WM_DELETE_WINDOW", self.close)
+        win.bind("<Escape>", lambda e: self.close())
+
+    # recording
+    def toggle(self):
+        if self.stream is None:
+            self.start()
+        else:
+            self.stop()
+
+    def start(self):
+        self.app.player.stop()
+        self.frames, self.wav = [], None
+        try:
+            self.stream = self.sd.InputStream(samplerate=self.RATE, channels=1, dtype="float32",
+                                              callback=self._callback)
+            self.stream.start()
+        except Exception as e:
+            self.stream = None
+            messagebox.showerror("Record a voice sample", tr("Could not start recording:\n{error}", error=e), parent=self.win)
+            return
+        self.started = time.time()
+        self.rec_btn.configure(text=tr("■ Stop"))
+        self.hint.configure(text=tr("Recording… press Stop when you're done (it stops by itself at 30 s)."))
+        self._tick()
+
+    def _callback(self, indata, frames, time_info, status):
+        self.frames.append(indata.copy())
+        self.level = float(abs(indata).max()) if len(indata) else 0.0
+
+    def _tick(self):
+        if self.stream is None:
+            return
+        secs = time.time() - self.started
+        self.timer.configure(text=f"{secs:.1f} s")
+        self.meter.delete("all")
+        w = int(360 * min(1.0, self.level * 1.4))
+        self.meter.create_rectangle(0, 0, w, 10, fill=CORAL if self.level < 0.95 else ERROR, width=0)
+        if secs >= self.MAX_SECONDS:
+            self.stop()
+        else:
+            self.win.after(60, self._tick)
+
+    def stop(self):
+        if self.stream is None:
+            return
+        try:
+            self.stream.stop()
+            self.stream.close()
+        finally:
+            self.stream = None
+        self.rec_btn.configure(text=tr("● Record again"))
+        self.meter.delete("all")
+        import numpy as np
+        audio_data = np.concatenate(self.frames)[:, 0] if self.frames else np.zeros(0, dtype="float32")
+        secs = len(audio_data) / self.RATE
+        self.timer.configure(text=f"{secs:.1f} s")
+        if secs < self.MIN_SECONDS:
+            self.hint.configure(text=tr("That was only {seconds:.1f} s. Record at least {minimum} s (10–30 s is best).",
+                                        seconds=secs, minimum=self.MIN_SECONDS))
+            return
+        tmp = self.app.out_root / "app" / "samples"
+        tmp.mkdir(parents=True, exist_ok=True)
+        self.wav = tmp / time.strftime("recording_%Y%m%d_%H%M%S.wav")
+        audio.write_wav(self.wav, audio_data, self.RATE)
+        quiet = float(abs(audio_data).max()) < 0.05
+        self.hint.configure(text=(tr("Very quiet: move closer to the microphone and record again.") + " " if quiet else "")
+                            + tr("Press Play to listen, then Save to my voices."))
+
+    def play(self):
+        if self.wav:
+            self.app.player.play(str(self.wav))
+
+    def save(self):
+        if self.stream is not None:
+            self.stop()
+        if not self.wav:
+            messagebox.showinfo("Record a voice sample", "Record a sample first.", parent=self.win)
+            return
+        if self.app._keep_voice(self.wav, self.name.get()):
+            self.close()
+
+    def close(self):
+        if self.stream is not None:
+            try:
+                self.stream.stop()
+                self.stream.close()
+            except Exception:
+                pass
+            self.stream = None
+        self.app.player.stop()
+        self.win.destroy()
+
+
 class App:
     def __init__(self, root: tk.Tk, cfg: dict):
         self.root, self.cfg = root, cfg
@@ -773,7 +901,8 @@ class App:
         self.field(side, "Korean voice")
         self.cb_ko = ttk.Combobox(side, textvariable=self.voice_ko, state="readonly", font=self.fonts["ui"])
         self.cb_ko.pack(fill="x", padx=14)
-        self.button(side, "+ Add voice file…", self.add_voice).pack(fill="x", padx=14, pady=(10, 0))
+        self.button(side, "● Record a voice sample…", self.record_voice).pack(fill="x", padx=14, pady=(10, 0))
+        self.button(side, "+ Add voice file…", self.add_voice).pack(fill="x", padx=14, pady=(6, 0))
         self.button(side, "↻ Refresh list", self.refresh_voices).pack(fill="x", padx=14, pady=(6, 0))
         self.refresh_voices()
 
@@ -917,19 +1046,40 @@ class App:
     def add_voice(self):
         path = filedialog.askopenfilename(title="Choose a voice sample (10–30 s of clear speech)",
                                           filetypes=[("Audio", "*.wav *.mp3 *.m4a *.flac *.ogg *.aac")])
-        if not path:
-            return
+        if path:
+            self._keep_voice(Path(path), Path(path).stem)
+
+    def record_voice(self):
+        """Record a voice sample with the microphone, check it, and keep it in voices/."""
         try:
-            prepared = prepare_sample(path, self.out_root / "app" / "samples")
+            import sounddevice as sd
+            sd.query_devices(kind="input")
+        except Exception as e:
+            messagebox.showerror("Record a voice sample",
+                                 tr("No microphone is available to ursoTTS.\n\n({error})\n\n"
+                                    "Check that a microphone is connected and that ursoTTS (or Terminal) may use it: "
+                                    "System Settings → Privacy & Security → Microphone. You can also record in the web UI, "
+                                    "or use “+ Add voice file…” with a recording you made elsewhere.",
+                                    error=f"{type(e).__name__}: {e}"))
+            return
+        VoiceRecorder(self, sd)
+
+    def _keep_voice(self, wav_path: Path, name: str):
+        """Convert a recording or file to a clean sample and save it as voices/<name>.wav."""
+        try:
+            prepared = prepare_sample(str(wav_path), self.out_root / "app" / "samples")
         except UserError as e:
             messagebox.showerror("Voice sample", tr_exc(e))
-            return
+            return None
         self.voices_dir.mkdir(parents=True, exist_ok=True)
-        name = re.sub(r"[^\w\-]+", "_", Path(path).stem).strip("_") or "my_voice"
+        name = re.sub(r"[^\w\-]+", "_", name).strip("_") or "my_voice"
         target = self.voices_dir / f"{name}.wav"
+        if target.exists() and not messagebox.askyesno("Voice sample", tr("{name} already exists. Replace it?", name=target.name)):
+            return None
         target.write_bytes(Path(prepared).read_bytes())
         self.refresh_voices()
         self.log(tr("Added voice {name} (converted to mono 24 kHz, silence trimmed).", name=target.name) + "\n", "accent")
+        return target
 
     def open_script(self):
         if not self.confirm_unsaved():

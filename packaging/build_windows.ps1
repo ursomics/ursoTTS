@@ -16,7 +16,7 @@ try {
     elseif ($HadLangFile) { Remove-Item $LangFile }
     Write-Host ("Building the " + $(if ($Ko) { "Korean (ko)" } else { "English (en)" }) + " edition")
     python -m pip install --upgrade pip
-    python -m pip install ".[chatterbox]" pyinstaller
+    python -m pip install ".[chatterbox]" sounddevice pyinstaller
     pyinstaller packaging\ursotts.spec --noconfirm --clean
 }
 finally {

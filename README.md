@@ -84,7 +84,7 @@ Get the installer for your computer from the [latest release](https://github.com
 | **Mac** (Apple Silicon) | `ursoTTS-1.0.0-mac-arm64.dmg` | Open it and drag **ursoTTS** into **Applications** |
 | **Windows** (64-bit) | `ursoTTS-1.0.0-windows-setup.exe` | Run it and follow the steps |
 
-- **First open:** the app isn't signed with a paid developer certificate yet, so your computer asks for confirmation once. **Mac:** click **Done** on the warning, open **System Settings → Privacy & Security**, scroll to **Security**, and click **Open Anyway** (on older macOS: right-click ursoTTS → **Open** → **Open**). **Windows:** **More info** → **Run anyway**.
+- **First open:** the app isn't signed with a paid developer certificate yet, so you confirm it once. Mac: open ursoTTS, then **System Settings → Privacy & Security → Open Anyway**. Windows: in the SmartScreen window, **More info** → **Run anyway**. Both are shown [step by step with screenshots](docs/MANUAL.md#72-install-without-python-dmg--exe).
 - **First narration** downloads the voice model (a few GB) once, so you need an internet connection the first time.
 - Your files live in a **`ursoTTS`** folder in your home folder: put voice samples in `voices/`, scripts in `scripts/`, and find results in `output/`.
 
@@ -94,7 +94,16 @@ Prefer the command line or the web UI? Install from source with the quick start 
 
 The project is called **ursoTTS**; the command you type is `ursotts`.
 
-Tested on macOS (Apple Silicon) with Python 3.13. Python 3.10 or newer works.
+Tested on:
+
+| System | Python | What was tested |
+|---|---|---|
+| macOS (Apple Silicon) | 3.13 | Everything, in real use with the voice model; the installer (.dmg) too |
+| Linux (Ubuntu) | 3.10–3.13 | Automated tests on every update: the commands, web UI and pipeline, with the test engine |
+| Linux (Ubuntu) | 3.12 | The desktop app, the installer build and the launcher, with the test engine |
+| Windows (64-bit) | 3.11 (in the installer) | The installer (.exe): installed and used |
+
+Python 3.10 or newer works. On Linux the voice model itself hasn't been tested yet; reports are welcome.
 
 ```bash
 # 1. Get the project: unzip ursotts.zip, or run
@@ -137,7 +146,7 @@ A step-by-step guide to every tab is in the [manual](docs/MANUAL.md#6-using-the-
 
 ### As a desktop app
 
-<p align="center"><img src="docs/images/app-speak.png" alt="The ursoTTS desktop app" width="92%"></p>
+<p align="center"><img src="docs/images/app-tabs.gif" alt="The ursoTTS desktop app: Speak, Pronunciation, Batch and Claude Code views" width="92%"></p>
 
 ```bash
 ursotts app
@@ -240,6 +249,8 @@ New engines only need to subclass `BaseEngine` in `ursotts/engine.py`. Before op
 
 MIT © 2026 Ursus (@ursomics). Chatterbox is © Resemble AI, MIT License.
 
+The bundled **Poppins** font is © The Poppins Project Authors, under the SIL Open Font License 1.1 (`ursotts/assets/fonts/OFL.txt`).
+
 The ursoTTS name, logo and bear artwork in `docs/brand/` are © 2026 Ursus (@ursomics) and are not covered by the MIT license.
 
 Not affiliated with or endorsed by Anthropic. Claude and Claude Code are trademarks of Anthropic.
@@ -250,5 +261,3 @@ Not affiliated with or endorsed by Anthropic. Claude and Claude Code are tradema
   <img src="docs/brand/avatar_160.png" width="72" alt="ursoTTS bear"><br>
   <sub>Made with <img src="docs/brand/avatar_160.png" height="18" alt="ursoTTS bear"> by <a href="https://github.com/ursomics">ursomics@GitHub</a> · <a href="https://ursomics.com">ursomics.com</a> · <a href="https://youtube.com/@ursomics">@ursomics</a></sub>
 </p>
-
-The bundled **Poppins** font is © The Poppins Project Authors, under the SIL Open Font License 1.1 (`ursotts/assets/fonts/OFL.txt`).

@@ -590,16 +590,18 @@ Installed it from a `.dmg` or `.exe` (see [7.2](#72-install-without-python-dmg--
 | Part | What it does |
 |---|---|
 | **Activity bar** (far left) | Microphone = Speak · Text = Pronunciation · Folder = Batch · Terminal = Claude Code · Gear (bottom) opens `config.yaml`; the selected view is coral |
-| **Sidebar** | Language, voices (with **+ Add voice file…**), speaking style and the list of output files; drag its edge to resize |
+| **Sidebar** | Language, voices (with **● Record a voice sample…** and **+ Add voice file…**), speaking style and the list of output files; drag its edge to resize |
 | **Editor** | Your script with line numbers and colors (comments, `@lang`, `[pause]`); **Open…**, **Save as…** and **Generate narration** |
 | **OUTPUT panel** | The live log with timings; **⌘J** shows or hides it |
 | **Status bar** | Version, engine and whether the voice model is loaded |
 
 <p><img src="images/app-pronunciation.png" width="49%" alt="Desktop app: the Pronunciation view"> <img src="images/app-batch.png" width="49%" alt="Desktop app: the Batch view"></p>
 
-Shortcuts: **⌘↵** runs the current view, **⌘1–4** switch views, **⌘O** opens a script, **⌘S** saves it (**⇧⌘S** saves under a new name), **⌘+** / **⌘−** zoom in and out (70–160%), **⌘0** returns to 100%. In Batch, the folder dialog has a **New Folder** button. The window remembers its size, zoom, panels, last view, script and folders.
+Shortcuts: **⌘↵** runs the current view, **⌘1–4** switch views, **⌘O** opens a script, **⌘S** saves it (**⇧⌘S** saves under a new name), **⌘+** / **⌘−** zoom in and out (70–160%), **⌘0** returns to 100%, **⌘K ⌘T** chooses a color theme. In Batch, the folder dialog has a **New Folder** button. The window remembers its size, zoom, panels, last view, script and folders.
 
 The desktop app uses Tkinter, which comes with Python from python.org. With Homebrew's Python, install it once with `brew install python-tk@3.13` (match your Python version). The web UI keeps working either way.
+
+**Color themes.** Choose **View → Color Theme** (or press **⌘K** then **⌘T**, as in VS Code): Dark+, Light+, ursoTTS Cream, Monokai, Solarized Dark, Solarized Light or High Contrast. The window restarts in a second with the new colors; your script, folders and layout are kept, and it asks first if there are unsaved changes.
 
 **Saving and closing.** Narration files are saved as soon as they're made (in `output/app/`), and the editor's text is kept for next time. When the script belongs to a file you opened or saved, a **●** in the tab means unsaved changes, and the app asks before closing. It also asks before quitting while narration is still being made.
 
@@ -610,19 +612,39 @@ The desktop app uses Tkinter, which comes with Python from python.org. With Home
 
 ### 7.2 Install without Python (.dmg / .exe)
 
-![The ursoTTS splash screen](images/app-splash.png)
+![The ursoTTS installer window: drag ursoTTS into Applications](images/install-01-dmg.png)
 
 The desktop app is also available as a normal installer, for people who don't want to use Python or the terminal. Download it from the [latest release](https://github.com/ursomics/ursotts/releases/latest): `ursoTTS-1.0.0-mac-arm64.dmg` for a Mac with Apple Silicon (open it and drag ursoTTS into Applications), or `ursoTTS-1.0.0-windows-setup.exe` for Windows. The version number in the name changes with each release.
 
-- **First open:** the installers aren't signed with a paid certificate yet. On a Mac, right-click ursoTTS → **Open** → **Open**; on Windows, click **More info** → **Run anyway**. You only do this once.
-- **Your files:** the installed app works in a **`ursoTTS`** folder in your home folder, created on first launch with the default settings and example scripts. Add your voice with **+ Add voice file…**; results go to `output/`.
+- **First open:** the installers aren't signed with a paid certificate yet, so your computer asks you to confirm once (step by step below).
+- **Your files:** the installed app works in a **`ursoTTS`** folder in your home folder, created on first launch with the default settings and example scripts. Add your voice with **● Record a voice sample…** or **+ Add voice file…**; results go to `output/`.
 - **Voice model:** downloaded once with your first narration (a few GB, internet needed).
 - **Claude Code view:** in the installed app it works in Ask mode only, because the app's own code is sealed inside the installer. To change the app, use the source version.
 - **MP3 export** works without installing ffmpeg; a copy is included.
 
+**First open on a Mac.** macOS blocks apps from developers it doesn't know yet. You confirm once:
+
+1. Open **ursoTTS** from Applications. macOS says it can't verify the app; click **Done**.
+2. Open **System Settings → Privacy & Security** and scroll down to **Security**.
+3. Next to *"ursoTTS" was blocked to protect your Mac*, click **Open Anyway**.
+4. In the confirmation, click **Open Anyway** again and approve with your password or Touch ID.
+
+![Privacy & Security: Open Anyway next to "ursoTTS was blocked"](images/install-02-privacy-security.png)
+
+![The confirmation: Open Anyway](images/install-03-open-anyway.png)
+
+**First open on Windows.** Microsoft Defender SmartScreen may stop the installer the first time:
+
+1. In *Windows protected your PC*, click **More info**.
+2. Check that the app is **ursoTTS-1.0.0-windows-setup.exe**, then click **Run anyway** and follow the installer.
+
+<p><img src="images/install-win-01-more-info.png" width="49%" alt="SmartScreen: click More info"> <img src="images/install-win-02-run-anyway.png" width="49%" alt="SmartScreen: Run anyway"></p>
+
+These steps are needed only once, the first time. After that, ursoTTS opens like any other app.
+
 <p><img src="images/app-installed.png" width="68%" alt="The installed app on first launch, working in ~/ursoTTS"> <img src="images/app-about.png" width="29%" alt="Help → About ursoTTS"></p>
 
-On first launch the voice lists are empty: add your sample with **+ Add voice file…**. **Help → About ursoTTS** shows the version.
+On first launch the voice lists are empty: record your sample with **● Record a voice sample…** (macOS asks once for microphone access) or add a file with **+ Add voice file…**. **Help → About ursoTTS** shows the version.
 
 ### 7.3 Change the app with Claude Code
 
@@ -811,7 +833,7 @@ Convert ~/Desktop/my_voice_en.m4a to voices/my_voice_en.wav: mono, 24 kHz,
 trim silence at the start and end. Tell me the final length in seconds.
 ```
 
-You can also record a sample directly in the web UI (**Speak** tab → *Record or upload a new sample*) or add one in the desktop app (**+ Add voice file…**).
+You can also record a sample directly in the web UI (**Speak** tab → *Record or upload a new sample*) or in the desktop app (**● Record a voice sample…**, or **+ Add voice file…** for an existing recording).
 
 **A sample made by another TTS service works for testing**, but cloning a clone loses some naturalness. Your own recording gives the best result.
 

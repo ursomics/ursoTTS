@@ -28,7 +28,7 @@ print("ursoTTS build language:", _lang_file.read_text(encoding="utf-8").strip() 
 # so collect them whole. Packages that aren't installed are skipped.
 for pkg in ("chatterbox", "perth", "s3tokenizer", "librosa", "conformer", "diffusers",
             "transformers", "safetensors", "huggingface_hub", "tokenizers", "imageio_ffmpeg",
-            "pkuseg", "spacy_pkuseg"):
+            "pkuseg", "spacy_pkuseg", "sounddevice", "_sounddevice_data"):
     try:
         d, b, h = collect_all(pkg)
         datas += d; binaries += b; hiddenimports += h
@@ -74,5 +74,6 @@ if MAC:
             "CFBundleShortVersionString": VERSION,
             "NSHighResolutionCapable": True,
             "NSHumanReadableCopyright": "© 2026 Ursus (@ursomics). MIT license.",
+            "NSMicrophoneUsageDescription": "ursoTTS uses the microphone to record your voice sample.",
         },
     )

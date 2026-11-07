@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-  <b>내 목소리를, 몇 번이고 다시.</b><br>
-  영상 크리에이터를 위한 보이스 클로닝 내레이션 도구. Claude Code로 만들었습니다.
+  <b>내 목소리로, 원하는 만큼 다시 만들어 보세요.</b><br>
+  영상 크리에이터를 위한 보이스 클로닝 내레이션 도구입니다. Claude Code로 개발했습니다.
 </p>
 
 <p align="center">
@@ -23,34 +23,34 @@
 
 <p align="center">
   <a href="#빠른-시작">빠른 시작</a> ·
-  <a href="#사용법">웹 UI</a> ·
+  <a href="#사용-방법">웹 UI</a> ·
   <a href="#발음">발음</a> ·
   <a href="docs/MANUAL.ko.md">매뉴얼</a>
 </p>
 
 ---
 
-**ursoTTS™: 영상 크리에이터를 위한 보이스 클로닝 일괄 내레이션.** 대본을 일반 텍스트 파일로 쓰고, 목소리를 한 번만 녹음하면, 모든 영상의 내레이션(WAV + MP3 + 자막)이 완성됩니다. 오픈소스 모델로 내 컴퓨터에서 실행되므로 글자 수 단위 요금이 없습니다. 데스크톱 앱, 브라우저의 간단한 웹 페이지, 명령줄 어디서든 쓸 수 있습니다.
+**ursoTTS™는 영상 크리에이터를 위한 보이스 클로닝 일괄 내레이션 도구입니다.** 대본을 텍스트 파일로 작성하고 목소리를 한 번 녹음하면, 영상마다 필요한 내레이션과 자막을 WAV 및 MP3 파일로 만들 수 있습니다. 오픈소스 모델을 내 컴퓨터에서 실행하므로 글자 수에 따라 요금을 내지 않아도 됩니다. 데스크톱 앱, 웹 브라우저, 명령줄에서 사용할 수 있습니다.
 
-[@ursomics](https://youtube.com/@ursomics) 생물정보학 영상 시리즈(영어 + 한국어)를 위해 만들었고, Claude Code로 개발했습니다.
+[@ursomics](https://youtube.com/@ursomics)의 영어·한국어 생물정보학 영상 시리즈를 위해 만들었으며, Claude Code로 개발했습니다.
 
-📖 **처음이신가요? [매뉴얼](docs/MANUAL.ko.md)을 읽어 보세요.** Claude Code(VS Code, 데스크톱 앱, CLI)로 설치하는 법, 웹 UI, 터미널 명령어, 대본 쓰는 법, 발음 고치는 법을 다룹니다.
+📖 **처음 사용하시나요? [매뉴얼](docs/MANUAL.ko.md)을 확인해 보세요.** VS Code, 데스크톱 앱 또는 CLI에서 Claude Code를 이용한 설치부터 웹 UI와 터미널 명령어 사용, 대본 작성과 발음 수정까지 안내합니다.
 
 <p align="center">
   <img src="docs/images/webui-tabs.gif" alt="ursoTTS 웹 UI: Speak, Pronunciation, Batch 탭" width="92%">
   <br><sub><b>Speak</b>: 내 목소리로 내레이션 생성 · <b>Pronunciation</b>: 표기를 귀로 비교 · <b>Batch</b>: 폴더 전체 생성</sub>
 </p>
 
-## 왜 ursoTTS인가
+## ursoTTS를 쓰는 이유
 
-클라우드 보이스 클로닝 서비스는 글자 수만큼 요금을 받습니다. 영상 수백 편짜리 시리즈라면 금방 큰 비용이 됩니다. ursoTTS는 [Chatterbox](https://github.com/resemble-ai/chatterbox)(Resemble AI, MIT 라이선스)를 내 컴퓨터에서 실행합니다. 설치가 끝나면 영상이 늘어나도 드는 것은 GPU 사용 시간뿐입니다.
+클라우드 보이스 클로닝 서비스는 생성하는 글자 수에 따라 요금을 부과합니다. 영상이 수백 편에 이르는 시리즈라면 비용이 빠르게 늘어날 수 있습니다. ursoTTS는 [Chatterbox](https://github.com/resemble-ai/chatterbox)(Resemble AI, MIT 라이선스)를 내 컴퓨터에서 실행합니다. 설치를 마치면 추가 비용은 GPU 사용 시간뿐입니다.
 
 ## 주요 기능
 
 - **웹 UI.** 텍스트를 붙여 넣고, 브라우저에서 목소리 샘플을 녹음하거나 올리고, 슬라이더로 말투를 조정한 뒤 결과를 내려받습니다.
 - **일괄(batch) 모드.** 대본 폴더를 지정하면 대본마다 내레이션 하나씩을 만듭니다.
 - **두 언어 지원.** 영어와 한국어를 **문장마다** 감지하므로 한국어·영어가 섞인 대본도 됩니다. 언어마다 다른 목소리 샘플을 쓸 수 있습니다.
-- **똑똑한 재생성.** 대본의 텍스트나 설정이 바뀐 경우에만 다시 만들고, 그때도 바뀐 문장만 새로 생성합니다. 10분짜리 대본의 오타 하나는 몇 초 만에 고쳐집니다.
+- **필요한 부분만 다시 생성.** 대본이나 설정이 바뀐 경우에만 작업하며, 바뀐 문장만 다시 만듭니다. 10분짜리 대본도 오타가 있는 문장만 몇 초 안에 고칠 수 있습니다.
 - **자막 포함.** 내레이션 타이밍에 맞춘 `.srt` 파일이 함께 나오며, 원래 표기를 그대로 유지합니다(발음용 표기가 아니라 `scRNA-seq`).
 - **매끄러운 약어.** `DNA`, `ATP` 같은 대문자 약어를 글자마다 자연스럽게 읽습니다. 영어는 `D.N.A.`, 한국어는 `디엔에이`. `config.yaml`에서 `spell_acronyms: false`로 끌 수 있습니다.
 - **전문 용어의 정확한 발음.** 유전자 이름과 도구 이름을 어떻게 읽을지 정할 수 있습니다(`CD8: C.D. eight`, `NANOG: NAN.og`, `GATA6: 가타식스`). 영어와 한국어로 생물정보학 용어 약 60개가 기본으로 들어 있습니다.
@@ -73,28 +73,37 @@
 - **제품·앱 소개:** 데모 영상, 사용 안내, 업데이트 소개.
 - **접근성:** 문서의 오디오 버전과, 읽으며 보는 사람을 위한 자막.
 
-내 목소리, 또는 허락받은 목소리만 클로닝하세요.
+본인의 목소리나 사용 허락을 받은 목소리만 클로닝하세요.
 
-## 앱 내려받기 (Python 필요 없음)
+## 앱 다운로드 (Python 설치 불필요)
 
-[최신 릴리스](https://github.com/ursomics/ursotts/releases/latest)에서 내 컴퓨터용 설치 파일을 받으세요:
+[최신 릴리스](https://github.com/ursomics/ursotts/releases/latest) 페이지에서 운영체제에 맞는 설치 파일을 다운로드하세요.
 
 | 컴퓨터 | 파일 | 설치 |
 |---|---|---|
-| **Mac** (Apple Silicon) | `ursoTTS-1.0.0-mac-arm64.dmg` | 열고 **ursoTTS**를 **응용 프로그램(Applications)** 으로 끌어다 놓기 |
-| **Windows** (64비트) | `ursoTTS-1.0.0-windows-setup.exe` | 실행하고 안내 따르기 |
+| **Mac** (Apple Silicon) | `ursoTTS-1.0.0-mac-arm64.dmg` | 파일을 열고 **ursoTTS** 아이콘을 **응용 프로그램(Applications)** 폴더로 드래그하세요. |
+| **Windows** (64비트) | `ursoTTS-1.0.0-windows-setup.exe` | 설치 파일을 실행한 뒤 안내에 따라 설치하세요. |
 
-- **처음 열 때:** 아직 유료 개발자 인증서로 서명되지 않아 처음 한 번 확인을 묻습니다. **Mac:** 경고창에서 **완료**를 누르고, **시스템 설정 → 개인정보 보호 및 보안**을 열어 **보안** 항목에서 **그래도 열기**를 누르세요 (이전 macOS: ursoTTS를 오른쪽 클릭 → **열기** → **열기**). **Windows:** **추가 정보** → **실행**.
+- **처음 열 때:** 아직 유료 개발자 인증서로 서명되지 않아 처음 한 번 직접 허용해야 합니다. Mac: ursoTTS를 연 뒤 **시스템 설정 → 개인정보 보호 및 보안 → 그래도 열기**. Windows: SmartScreen 창에서 **추가 정보** → **실행**. 두 과정 모두 [스크린샷과 함께 단계별로 안내](docs/MANUAL.ko.md#72-python-없이-설치하기-dmg--exe)합니다.
 - **첫 내레이션**을 만들 때 목소리 모델(몇 GB)을 한 번 내려받으므로, 처음에는 인터넷 연결이 필요합니다.
 - 내 파일은 홈 폴더의 **`ursoTTS`** 폴더에 있습니다. 목소리 샘플은 `voices/`, 대본은 `scripts/`에 넣고, 결과는 `output/`에서 찾으세요.
 
-명령줄이나 웹 UI를 쓰려면 아래 빠른 시작대로 소스에서 설치하세요.
+명령줄이나 웹 UI를 사용하려면 아래 안내에 따라 소스 코드에서 설치하세요.
 
 ## 빠른 시작
 
 프로젝트 이름은 **ursoTTS**이고, 입력하는 명령어는 `ursotts`입니다.
 
-macOS(Apple Silicon)와 Python 3.13에서 테스트했습니다. Python 3.10 이상이면 됩니다.
+테스트 환경:
+
+| 운영체제 | Python 버전 | 테스트 범위 |
+|---|---:|---|
+| macOS (Apple Silicon) | 3.13 | 실제 목소리 모델을 사용해 전체 기능 테스트, 설치 파일(.dmg) 포함 |
+| Linux (Ubuntu) | 3.10–3.13 | 업데이트마다 명령줄, 웹 UI, 생성 과정을 테스트 엔진으로 자동 테스트 |
+| Linux (Ubuntu) | 3.12 | 데스크톱 앱, 설치 파일 빌드, 실행 아이콘을 테스트 엔진으로 확인 |
+| Windows (64비트) | 3.11(설치 파일에 포함) | 설치 파일(.exe)로 설치해 실제 사용 확인 |
+
+Python 3.10 이상이면 됩니다. Linux에서는 목소리 모델 자체를 아직 테스트하지 않았습니다. 사용해 보신 결과를 알려 주시면 반영하겠습니다.
 
 ```bash
 # 1. 프로젝트 받기: ursotts.zip을 풀거나, 다음을 실행합니다
@@ -117,7 +126,7 @@ ursotts check
 
 처음 실제로 실행할 때 Hugging Face에서 Chatterbox 모델 가중치(몇 GB)를 내려받습니다.
 
-## 사용법
+## 사용 방법
 
 ### 브라우저에서
 
@@ -125,9 +134,9 @@ ursotts check
 ursotts ui
 ```
 
-**http://127.0.0.1:7860** 이 열립니다. 내 컴퓨터에서만 실행되므로 아무것도 외부로 업로드되지 않습니다.
+브라우저에서 **http://127.0.0.1:7860**이 열립니다. 내 컴퓨터에서만 실행되며 파일이나 음성이 외부로 전송되지 않습니다.
 
-시스템의 라이트/다크 모드를 따라갑니다.
+시스템에 설정된 라이트 모드 또는 다크 모드에 맞춰 표시됩니다.
 
 - **Speak 탭:** 대본을 붙여 넣고, 언어와 언어별 저장된 목소리를 고른 뒤 **Generate narration**을 누릅니다. 새 목소리를 쓰려면 *Record or upload a new sample*을 고르고 10~30초 녹음한 뒤 **Save to my voices**로 저장하세요. **Speaking style**에서 표현력, 속도, 변화를 조정합니다. 결과는 `output/ui/`에 저장됩니다.
 - **Pronunciation 탭:** 한 단어의 여러 표기를 나란히 듣고 가장 좋은 것을 저장합니다.
@@ -137,7 +146,7 @@ ursotts ui
 
 ### 데스크톱 앱으로
 
-<p align="center"><img src="docs/images/app-speak.png" alt="ursoTTS 데스크톱 앱" width="92%"></p>
+<p align="center"><img src="docs/images/app-tabs.gif" alt="ursoTTS 데스크톱 앱: Speak, Pronunciation, Batch, Claude Code 화면" width="92%"></p>
 
 ```bash
 ursotts app
@@ -161,7 +170,7 @@ output/name.wav   output/name.mp3   output/name.srt   output/batch_report.json
 
 `batch`를 다시 실행하면 텍스트와 설정이 바뀌지 않은 대본은 건너뜁니다. 전부 다시 만들려면 `--force`를 붙이세요. 문장 캐시 덕분에 그래도 빠릅니다.
 
-## 내 목소리 샘플 녹음하기
+## 목소리 샘플 녹음하기
 
 녹음 파일을 `voices/`에 넣고 `config.yaml`에 적습니다:
 
@@ -171,13 +180,13 @@ voices:
   ko: voices/my_voice_ko.wav
 ```
 
-좋은 클론을 위한 팁:
+목소리를 잘 복제하려면 다음을 참고하세요.
 - 영상과 같은 말투로 **10~30초** 동안 자연스럽게 말하세요.
-- 조용한 방에서, 음악 없이, 한 사람만, 마이크와의 거리를 일정하게 유지하세요.
+- 조용한 곳에서 배경 음악 없이 혼자 녹음하고, 마이크와의 거리를 일정하게 유지하세요.
 - 언어마다 샘플을 하나씩 녹음하세요. 한국어는 한국어 녹음으로 클로닝해야 가장 자연스럽습니다.
 - WAV가 가장 좋고, MP3도 됩니다.
 
-목록에 있는 샘플이 없으면 ursoTTS는 실행을 거부합니다. 그래서 실수로 다른 사람 목소리로 일괄 생성할 일이 없습니다.
+설정에 등록한 샘플 파일이 없으면 ursoTTS가 실행되지 않습니다. 덕분에 실수로 다른 사람의 목소리로 일괄 생성하는 일을 막을 수 있습니다.
 
 ## 발음
 
@@ -226,27 +235,29 @@ Welcome to Ursomics. Today we run scRNA-seq QC with Claude Code.
 | CPU만 | 되지만 느림. 짧은 클립에는 충분 |
 | 클라우드 GPU (RunPod, Colab 등) | 시간 단위로 빌려 한 번에 많은 대본을 생성 |
 
-## 책임 있는 사용
+## 책임감 있게 사용하기
 
-**내 목소리**, 또는 명시적으로 허락받은 목소리만 클로닝하세요. Chatterbox는 생성한 오디오에 들리지 않는 워터마크를 넣습니다. 지우지 말아 주세요. `ursotts ui --share`는 임시 공개 링크를 만드니, 의도한 경우에만 쓰세요.
+**본인의 목소리**나 명시적인 사용 허락을 받은 목소리만 클로닝하세요. Chatterbox는 생성한 오디오에 들리지 않는 워터마크를 넣습니다. 워터마크를 제거하지 마세요. `ursotts ui --share`는 임시 공개 링크를 만드니, 의도한 경우에만 쓰세요.
 
 ## 기여하기
 
-환영하는 기여 아이디어:
+다음과 같은 기여를 환영합니다.
 
 - [ ] 대체 백엔드로 CosyVoice2 엔진(Apache 2.0)
 - [ ] 대화·인터뷰를 위한 줄 단위 목소리 전환
 - [ ] 자동 감지 언어 추가(현재 영어와 한국어)
 
-새 엔진은 `ursotts/engine.py`의 `BaseEngine`을 상속하기만 하면 됩니다. pull request를 열기 전에 `ursotts batch scripts output --engine dummy`로 전체 과정이 잘 되는지 확인해 주세요.
+새 엔진을 추가하려면 `ursotts/engine.py`의 `BaseEngine`을 상속하면 됩니다. pull request를 보내기 전에 `ursotts batch scripts output --engine dummy`를 실행해 전체 처리 과정이 정상 동작하는지 확인해 주세요.
 
 ## 라이선스
 
 MIT © 2026 Ursus (@ursomics). Chatterbox는 © Resemble AI, MIT 라이선스입니다.
 
+함께 들어 있는 **Poppins** 글꼴은 © The Poppins Project Authors이며, SIL Open Font License 1.1을 따릅니다(`ursotts/assets/fonts/OFL.txt`).
+
 `docs/brand/`의 ursoTTS 이름, 로고, 곰 그림은 © 2026 Ursus (@ursomics)이며 MIT 라이선스 대상이 아닙니다.
 
-Anthropic과 제휴하거나 Anthropic의 보증을 받은 프로젝트가 아닙니다. Claude와 Claude Code는 Anthropic의 상표입니다.
+이 프로젝트는 Anthropic과 제휴 관계가 없으며, Anthropic의 후원을 받지 않습니다. Claude와 Claude Code는 Anthropic의 상표입니다.
 
 ---
 
@@ -254,5 +265,3 @@ Anthropic과 제휴하거나 Anthropic의 보증을 받은 프로젝트가 아�
   <img src="docs/brand/avatar_160.png" width="72" alt="ursoTTS 곰"><br>
   <sub>Made with <img src="docs/brand/avatar_160.png" height="18" alt="ursoTTS bear"> by <a href="https://github.com/ursomics">ursomics@GitHub</a> · <a href="https://ursomics.com">ursomics.com</a> · <a href="https://youtube.com/@ursomics">@ursomics</a></sub>
 </p>
-
-함께 들어 있는 **Poppins** 글꼴은 © The Poppins Project Authors이며, SIL Open Font License 1.1을 따릅니다(`ursotts/assets/fonts/OFL.txt`).

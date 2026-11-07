@@ -33,7 +33,7 @@ echo "Building the ${BUILD_LANG} edition"
 
 VERSION=$(python3 -c "import re;print(re.search(r'__version__ = \"([^\"]+)\"', open('ursotts/__init__.py').read()).group(1))")
 python3 -m pip install --upgrade pip
-python3 -m pip install ".[chatterbox]" pyinstaller pillow
+python3 -m pip install ".[chatterbox]" sounddevice pyinstaller pillow
 pyinstaller packaging/ursotts.spec --noconfirm --clean
 
 DMG="dist/ursoTTS-${VERSION}-mac-arm64.dmg"

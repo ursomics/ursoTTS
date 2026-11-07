@@ -138,6 +138,26 @@ KO = {
     "Open pronunciations.yaml": "pronunciations.yaml 열기",
     "No pronunciation rules file yet. Save a rule first.": "발음 규칙 파일이 아직 없습니다. 먼저 규칙을 저장하세요.",
 
+    # ---- voice recording
+    "● Record a voice sample…": "● 목소리 샘플 녹음…",
+    "● Record": "● 녹음",
+    "● Record again": "● 다시 녹음",
+    "Record a voice sample": "목소리 샘플 녹음",
+    "Record a sample first.": "먼저 샘플을 녹음하세요.",
+    "Speak naturally for 10–30 seconds, in the style of your videos.": "영상에서 말하는 스타일로 10–30초 동안 자연스럽게 말하세요.",
+    "A quiet room, one speaker, a steady distance from the microphone.": "조용한 방에서, 한 사람만, 마이크와 일정한 거리를 유지하세요.",
+    "Press Record when you're ready.": "준비되면 녹음을 누르세요.",
+    "Keep as": "저장 이름",
+    "Save to my voices": "내 목소리에 저장",
+    "Could not start recording:\n{error}": "녹음을 시작할 수 없습니다:\n{error}",
+    "Recording… press Stop when you're done (it stops by itself at 30 s).": "녹음 중… 끝나면 중지를 누르세요 (30초가 되면 자동으로 멈춥니다).",
+    "That was only {seconds:.1f} s. Record at least {minimum} s (10–30 s is best).": "녹음이 {seconds:.1f}초뿐입니다. 최소 {minimum}초 이상 녹음하세요 (10–30초가 가장 좋습니다).",
+    "Very quiet: move closer to the microphone and record again.": "소리가 너무 작습니다. 마이크에 더 가까이 다가가 다시 녹음하세요.",
+    "Press Play to listen, then Save to my voices.": "재생을 눌러 들어 본 뒤 '내 목소리에 저장'을 누르세요.",
+    "No microphone is available to ursoTTS.\n\n({error})\n\nCheck that a microphone is connected and that ursoTTS (or Terminal) may use it: System Settings → Privacy & Security → Microphone. You can also record in the web UI, or use “+ Add voice file…” with a recording you made elsewhere.":
+        "ursoTTS가 사용할 수 있는 마이크가 없습니다.\n\n({error})\n\n마이크가 연결되어 있고 ursoTTS(또는 터미널)의 마이크 사용이 허용되어 있는지 확인하세요: 시스템 설정 → 개인정보 보호 및 보안 → 마이크. 웹 UI에서 녹음하거나, 다른 곳에서 녹음한 파일을 “+ 목소리 파일 추가…”로 추가할 수도 있습니다.",
+    "{name} already exists. Replace it?": "{name}이(가) 이미 있습니다. 바꿀까요?",
+
     # ---- batch tab
     "Scripts folder": "스크립트 폴더",
     "Output folder": "출력 폴더",
